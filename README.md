@@ -1,5 +1,7 @@
 # ZTNA Connect
 
+![LUNIX](LUNIX.jpg)
+
 A GitHub Pages portfolio published behind **Cloudflare Zero Trust Access** — built as a live demo for BG ITversity Connect. It ships with a second zero-trust app: **save://**, a file platform on Cloudflare R2 that you can drive from inside the terminal.
 
 Anyone who visits must first prove their identity (email + one-time code) before the page — or any file operation — is ever served. This is **clientless Zero Trust Network Access (ZTNA)** in action: identity-based access control enforced at the edge, with no VPN and no client software.
@@ -73,6 +75,30 @@ man save          # manual page
 
 ---
 
+## LUNIX terminal — ready-made commands
+
+The page is a fake Linux terminal (`LUNIX` boots from the banner image in the repo root). Type `help` for the full list; highlights:
+
+| Command | What it does |
+|---|---|
+| `ls` `cd` `cat` `pwd` `tree` | browse this page like a filesystem |
+| `whoami` `connect` | your Access identity + live session info (email, policy, session length) |
+| `save` | zero-trust file platform: `save upload` opens the drop site, `save down [<name>]` lists/downloads the R2 bucket, `save rm`, `save du`, `man save` |
+| `nmap [-sV] [-sn] [-Pn] [-p <ports>] [<host>]` | port-scan theater: resolves any hostname or IP via 1.1.1.1 DoH, probes real reachability, reports open/filtered ports |
+| `ping [-c N] [-i S] <host>` | real ping: any hostname or IP literal; latency comes from a real HTTPS probe; dead/fake hosts time out and report 100% loss |
+| `dig [<name>] [<type>] [+short]` | real DNS queries via Cloudflare DoH (A, AAAA, CNAME, TXT, MX, NS, SOA) |
+| `iptables -L` | the Access gate rendered as firewall chains (FORWARD policy DROP) |
+| `curl` | shows what unauthenticated visitors get: `HTTP/2 302` to the Access login |
+| `neofetch` | real device info — browser engine, screen resolution, session uptime |
+| `checksec` | hardening report for this page (CSP, XSS, input caps) |
+| `matrix` `snake` `cowsay` `figlet` `weather` `fortune` `sl` `coffee` `clock` `hack` `42` `godmode` | terminal fun |
+| `sudo` `apt` `rm` | jokes with zero-trust punchlines (nobody gets root) |
+| `man <cmd>` | manual pages (e.g. `man save`) |
+
+Security tooling is honest about being a demo: DNS lookups are real, latency is measured, but the port table itself is scripted — the story it tells (only the edge answers) is the actual Cloudflare behavior.
+
+---
+
 ## How it works (layer by layer)
 
 | Layer | Component | Role |
@@ -137,7 +163,7 @@ curl -I https://ztna.blueberryservices.co.za
 
 ## Setup summary (how this was built)
 
-1. **GitHub:** created `ZTNA_CONNECT` repo, pushed `index.html`, enabled Pages, set custom domain `ztna.blueberryservices.co.za` (Enforce HTTPS left off — Cloudflare handles TLS).
+1. **GitHub:** created `ZTNA_CONNECT` repo, pushed `index.html` + the `LUNIX.jpg` banner (repo root, referenced as `LUNIX.jpg`), enabled Pages, set custom domain `ztna.blueberryservices.co.za` (Enforce HTTPS left off — Cloudflare handles TLS).
 2. **Cloudflare DNS:** added proxied `CNAME ztna → omegalulul.github.io` and `CNAME save → blueberryservices.co.za`.
 3. **Cloudflare Access:** created self-hosted apps for `ztna.blueberryservices.co.za` and `save.blueberryservices.co.za`, both 24h sessions.
 4. **Policy:** `Email OTP — Conference Attendees` → decision *allow*, include *everyone* (one policy per app).
