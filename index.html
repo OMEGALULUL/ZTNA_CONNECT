@@ -3,360 +3,916 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Christopher Leon Visser — Portfolio</title>
+<title>chris@ztna: ~ — ZTNA Connect</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'self' https://wttr.in; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none'; media-src 'none'; font-src 'none'">
+<meta name="referrer" content="no-referrer">
 <style>
   :root {
-    --bg: #0a0e1a;
-    --card: #111728;
-    --accent: #f6821f;
-    --accent2: #ffb36b;
-    --text: #e8ecf5;
-    --muted: #8b93a8;
-    --border: #1e2740;
-    --green: #34d399;
+    --bg: #000000;
+    --fg: #c9c9c9;
+    --dim: #767676;
+    --green: #4e9a06;
+    --blue: #729fcf;
+    --accent: #e95420;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
   body {
-    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
     background: var(--bg);
-    color: var(--text);
+    color: var(--fg);
+    font-family: Consolas, "Cascadia Mono", "Ubuntu Mono", "Courier New", monospace;
+    font-size: 14px;
     line-height: 1.6;
   }
-  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
-  header {
-    padding: 80px 0 50px;
-    background: radial-gradient(ellipse at top, rgba(246,130,31,.15), transparent 60%);
-    border-bottom: 1px solid var(--border);
-    text-align: center;
-  }
-  .badge {
-    display: inline-block;
-    background: rgba(246,130,31,.12);
-    border: 1px solid rgba(246,130,31,.4);
-    color: var(--accent2);
-    font-size: 12px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 6px 14px;
-    border-radius: 999px;
-    margin-bottom: 22px;
-  }
-  h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; }
-  h1 span { color: var(--accent); }
-  .tagline { color: var(--muted); font-size: 1.15rem; margin-top: 14px; }
-  .cta { margin-top: 28px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-  .btn {
-    display: inline-block;
-    padding: 12px 26px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 15px;
-    transition: transform .15s ease, box-shadow .15s ease;
-  }
-  .btn:hover { transform: translateY(-2px); }
-  .btn-primary { background: var(--accent); color: #1a1206; box-shadow: 0 4px 20px rgba(246,130,31,.35); }
-  .btn-ghost { border: 1px solid var(--border); color: var(--text); }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent2); }
-  section { padding: 60px 0; border-bottom: 1px solid var(--border); }
-  h2 { font-size: 1.6rem; margin-bottom: 8px; }
-  h2 small { display: block; color: var(--muted); font-size: .85rem; font-weight: 400; margin-bottom: 24px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 22px;
-    transition: border-color .15s ease, transform .15s ease;
-  }
-  .card:hover { border-color: var(--accent); transform: translateY(-3px); }
-  .card h3 { font-size: 1.05rem; margin-bottom: 8px; }
-  .card h3 a { color: var(--accent2); text-decoration: none; }
-  .card p { color: var(--muted); font-size: .92rem; }
-  .tags { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
-  .tag {
-    font-size: .75rem;
-    color: var(--accent2);
-    border: 1px solid rgba(246,130,31,.35);
-    background: rgba(246,130,31,.08);
-    padding: 3px 10px;
-    border-radius: 999px;
-  }
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 14px;
-    margin-top: 36px;
-  }
-  .stat {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 10px;
-  }
-  .stat b { display: block; font-size: 1.7rem; color: var(--accent); }
-  .stat span { font-size: .8rem; color: var(--muted); }
-  .identity-widget {
-    background: linear-gradient(135deg, rgba(52,211,153,.12), rgba(52,211,153,.03));
-    border: 1px solid rgba(52,211,153,.45);
-    border-radius: 14px;
-    padding: 22px 24px;
+  ::selection { background: var(--accent); color: #000; }
+
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 8px; min-height: 100%; display: flex; flex-direction: column; }
+
+  .term {
+    background: #000;
     display: flex;
+    flex-direction: column;
+    height: calc(100vh - 30px);
+  }
+  .term .body {
+    flex: 1;
+    padding: 12px 14px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 0;
+  }
+  .vt-out { white-space: pre-wrap; word-break: break-word; }
+  .vt-line {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    border-top: 1px solid #1c1c1c;
+  }
+  .vt-line .prompt { color: var(--fg); white-space: nowrap; }
+  #vt-input {
+    flex: 1;
+    background: transparent;
+    border: 0;
+    outline: none;
+    color: var(--fg);
+    font: inherit;
+    caret-color: var(--fg);
+    min-width: 60px;
+  }
+
+  .u { color: var(--green); font-weight: 700; }
+  .p { color: var(--blue); font-weight: 700; }
+  .dim { color: var(--dim); }
+  .accent { color: var(--accent); }
+  .blue { color: var(--blue); font-weight: 700; }
+  .green { color: var(--green); }
+  .http { color: var(--accent); }
+  .loc { color: var(--dim); }
+  .path { color: var(--blue); font-weight: 700; }
+
+  .explain { padding: 40px 20px 10px; max-width: 820px; }
+  .explain .comment { color: var(--dim); margin-bottom: 14px; }
+  .explain p { max-width: 700px; margin-bottom: 14px; }
+  .explain .log { border-top: 1px solid #1c1c1c; border-bottom: 1px solid #1c1c1c; padding: 14px 0; margin-top: 18px; white-space: pre-wrap; word-break: break-word; font-size: 13.5px; }
+
+  footer { padding: 14px 0 60px; color: var(--dim); font-size: 12px; border-top: 1px solid #1c1c1c; }
+  footer a { color: var(--dim); text-decoration: none; border-bottom: 1px solid var(--dim); }
+  footer a:hover { color: var(--accent); border-color: var(--accent); }
+
+  .tmux {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 18px;
-    flex-wrap: wrap;
+    gap: 12px;
+    background: #111;
+    border-top: 1px solid #26262a;
+    color: var(--dim);
+    font-size: 12px;
+    padding: 5px 12px;
+    user-select: none;
   }
-  .identity-widget .pulse {
-    width: 12px; height: 12px;
-    background: var(--green);
-    border-radius: 50%;
-    box-shadow: 0 0 0 0 rgba(52,211,153,.5);
-    animation: pulse 2s infinite;
-    flex-shrink: 0;
+  .tmux .ok { color: var(--ok); }
+  .tmux .green { color: var(--green); }
+
+  .boot {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    transition: opacity .6s ease;
   }
-  @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(52,211,153,.5); }
-    70% { box-shadow: 0 0 0 12px rgba(52,211,153,0); }
-    100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
-  }
-  .identity-widget .who { flex: 1; min-width: 200px; }
-  .identity-widget .who b { color: var(--green); font-size: 1.05rem; }
-  .identity-widget .who span { color: var(--muted); font-size: .85rem; }
-  .identity-widget .meta { text-align: right; font-size: .78rem; color: var(--muted); }
-  .identity-widget code { background: rgba(255,255,255,.07); padding: 2px 8px; border-radius: 6px; font-size: .85em; }
-  .timeline { position: relative; padding-left: 26px; }
-  .timeline::before {
-    content: "";
-    position: absolute;
-    left: 6px; top: 6px; bottom: 6px;
-    width: 2px;
-    background: linear-gradient(var(--accent), var(--border));
-  }
-  .tl-item { position: relative; margin-bottom: 26px; }
-  .tl-item::before {
-    content: "";
-    position: absolute;
-    left: -26px; top: 7px;
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--accent);
-    border: 3px solid var(--bg);
-  }
-  .tl-item h3 { font-size: 1.02rem; }
-  .tl-item .when { color: var(--accent2); font-size: .8rem; font-weight: 600; }
-  .tl-item p { color: var(--muted); font-size: .92rem; margin-top: 4px; }
-  .skill-row { margin-bottom: 14px; }
-  .skill-row .top { display: flex; justify-content: space-between; font-size: .88rem; margin-bottom: 6px; }
-  .skill-row .top b { color: var(--text); font-weight: 600; }
-  .skill-row .top span { color: var(--muted); }
-  .bar { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; }
-  .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 999px; }
-  .ztna-note {
-    background: linear-gradient(135deg, rgba(246,130,31,.1), rgba(246,130,31,.04));
-    border: 1px dashed rgba(246,130,31,.45);
-    border-radius: 14px;
-    padding: 22px;
-    font-size: .95rem;
-  }
-  .ztna-note strong { color: var(--accent2); }
-  .ztna-note code { background: rgba(255,255,255,.07); padding: 2px 8px; border-radius: 6px; font-size: .85em; }
-  .ztna-note .steps { margin-top: 12px; padding-left: 20px; color: var(--muted); font-size: .9rem; }
-  .contact-links { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
-  footer {
-    padding: 34px 0;
-    text-align: center;
-    color: var(--muted);
-    font-size: .85rem;
-  }
-  footer .shield { color: var(--accent); font-weight: 600; }
+  .boot.done { opacity: 0; pointer-events: none; }
+  .boot pre { color: var(--accent); line-height: 1.12; margin-bottom: 24px; text-align: center; }
+  .boot pre .peng { color: #d6d6d6; }
+  .boot .log { color: var(--dim); text-align: left; width: 100%; max-width: 660px; font-size: 13px; }
+  .boot .line { animation: fadein .2s ease; }
+  .boot .ok { color: var(--green); }
+  .boot .fatal { color: var(--accent); }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="container">
-    <div class="badge">Zero Trust Demo · BG ITversity Connect</div>
-    <h1>Hi, I'm <span>Christopher Leon Visser</span></h1>
-    <p class="tagline">IT student &amp; web developer building secure, real-world solutions — currently at Blueberry Services.</p>
-    <div class="cta">
-      <a class="btn btn-primary" href="https://github.com/OMEGALULUL" target="_blank">My GitHub</a>
-      <a class="btn btn-ghost" href="mailto:chris@blueberryservices.co.za">Get in touch</a>
-    </div>
-    <div class="stats">
-      <div class="stat"><b>5+</b><span>Projects shipped</span></div>
-      <div class="stat"><b>3</b><span>Core skill areas</span></div>
-      <div class="stat"><b>100%</b><span>Edge-protected</span></div>
-      <div class="stat"><b>24h</b><span>Access session</span></div>
-    </div>
-  </div>
-</header>
+<div class="wrap">
 
-<section>
-  <div class="container">
-    <h2>Live Access Session <small>Proof of identity-based access</small></h2>
-    <div class="identity-widget">
-      <div class="pulse"></div>
-      <div class="who">
-        <b id="auth-email">Verifying identity…</b>
-        <br>
-        <span>Authenticated via Cloudflare Access · Email OTP</span>
-      </div>
-      <div class="meta">
-        Policy: <code>Email OTP — Conference Attendees</code><br>
-        Gate: <code>ztna.blueberryservices.co.za</code>
-      </div>
-    </div>
-    <p style="color:var(--muted); font-size:.85rem; margin-top:14px;">This widget reads your identity from the Cloudflare Access session cookie. If you can see your email here, the ZTNA gate verified you before this page was served.</p>
-  </div>
-</section>
-
-<section>
-  <div class="container">
-    <h2>What I Do <small>Projects &amp; focus areas</small></h2>
-    <div class="grid">
-      <div class="card">
-        <h3>Web Development</h3>
-        <p>Responsive sites and apps with modern HTML, CSS and JavaScript — from landing pages to full prototypes.</p>
-        <div class="tags"><span class="tag">HTML/CSS</span><span class="tag">JavaScript</span><span class="tag">Responsive</span></div>
-      </div>
-      <div class="card">
-        <h3>Network &amp; Security</h3>
-        <p>Hands-on work with Cloudflare (DNS, Workers, Zero Trust Access), network fundamentals and secure hosting setups.</p>
-        <div class="tags"><span class="tag">Cloudflare</span><span class="tag">Zero Trust</span><span class="tag">DNS</span></div>
-      </div>
-      <div class="card">
-        <h3>IT Support</h3>
-        <p>End-user support, hardware troubleshooting and systems administration for small businesses.</p>
-        <div class="tags"><span class="tag">Windows</span><span class="tag">Networking</span><span class="tag">Troubleshooting</span></div>
-      </div>
-      <div class="card">
-        <h3>Programming</h3>
-        <p>Python, PowerShell and C — automation scripts, tools and even homebrew experiments for fun.</p>
-        <div class="tags"><span class="tag">Python</span><span class="tag">PowerShell</span><span class="tag">C</span></div>
-      </div>
+  <div class="term">
+    <div class="body" id="vt-body"></div>
+    <div class="vt-line">
+      <span class="prompt" id="vt-prompt"></span>
+      <input id="vt-input" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="terminal input">
     </div>
   </div>
-</section>
 
-<section>
-  <div class="container">
-    <h2>Experience <small>Where I've been building</small></h2>
-    <div class="timeline">
-      <div class="tl-item">
-        <h3>IT &amp; Web Services — Blueberry Services</h3>
-        <span class="when">2026 — Present</span>
-        <p>Cloudflare administration (DNS, Workers, email routing), website builds and hosting for small business clients, plus systems &amp; network support.</p>
-      </div>
-      <div class="tl-item">
-        <h3>Web Developer — Skybre (client project)</h3>
-        <span class="when">2026</span>
-        <p>Built and deployed marketing sites, managed DNS and email signatures, and handled partner integrations.</p>
-      </div>
-      <div class="tl-item">
-        <h3>IT Student — Diploma in IT</h3>
-        <span class="when">Current studies</span>
-        <p>Database design (Access &amp; SQL), web programming, networking fundamentals and project-based assignments.</p>
-      </div>
-    </div>
-  </div>
-</section>
+  <div class="explain">
+    <div class="comment"># why this page is locked</div>
+    <p>ZTNA in one sentence: the network doesn't trust you — you prove yourself on every request, and the origin never sees anyone who hasn't. This page is a demo of that, enforced by Cloudflare Access at the edge.</p>
+    <div class="log"><span class="u">$</span> curl -I https://ztna.blueberryservices.co.za
+<span class="http">HTTP/2 302</span>
+<span class="loc">location: https://dry-rice-70ec.cloudflareaccess.com/cdn-cgi/access/login/...</span>
+<span class="loc">www-authenticate: Cloudflare-Access</span>
+<span class="dim"># unauthenticated requests die here, at the edge</span>
 
-<section>
-  <div class="container">
-    <h2>Skills <small>Confidence levels</small></h2>
-    <div class="grid">
-      <div>
-        <div class="skill-row"><div class="top"><b>HTML &amp; CSS</b><span>90%</span></div><div class="bar"><i style="width:90%"></i></div></div>
-        <div class="skill-row"><div class="top"><b>JavaScript</b><span>70%</span></div><div class="bar"><i style="width:70%"></i></div></div>
-        <div class="skill-row"><div class="top"><b>Python &amp; PowerShell</b><span>65%</span></div><div class="bar"><i style="width:65%"></i></div></div>
-        <div class="skill-row"><div class="top"><b>C / Embedded</b><span>45%</span></div><div class="bar"><i style="width:45%"></i></div></div>
-      </div>
-      <div>
-        <div class="skill-row"><div class="top"><b>Cloudflare (DNS / Workers / Access)</b><span>85%</span></div><div class="bar"><i style="width:85%"></i></div></div>
-        <div class="skill-row"><div class="top"><b>Networking &amp; DNS</b><span>75%</span></div><div class="bar"><i style="width:75%"></i></div></div>
-        <div class="skill-row"><div class="top"><b>Databases (Access / SQL)</b><span>80%</span></div><div class="bar"><i style="width:80%"></i></div></div>
-        <div class="skill-row"><div class="top"><b>3D &amp; Design Tools</b><span>50%</span></div><div class="bar"><i style="width:50%"></i></div></div>
-      </div>
-    </div>
+<span class="accent">how it works:</span>
+1. dns: ztna → github pages, proxied through cloudflare
+2. gate: cloudflare access checks every request for a session
+3. no session → 302 to the login, email + one-time code
+4. verified → github pages origin serves this file
+5. no vpn, no client, no exposed origin — identity is the key</div>
   </div>
-</section>
 
-<section>
-  <div class="container">
-    <h2>Selected Projects <small>Things I've built</small></h2>
-    <div class="grid">
-      <div class="card">
-        <h3><a href="https://github.com/Blueberry-Technologies/Knockout-Pub---Grill" target="_blank">Knockout Pub &amp; Grill</a></h3>
-        <p>Full site for a boxing-themed restaurant — menu, gallery and ordering-focused design.</p>
-        <div class="tags"><span class="tag">HTML/CSS</span><span class="tag">JS</span><span class="tag">Cloudflare Pages</span></div>
-      </div>
-      <div class="card">
-        <h3>Skybre Marketing Site</h3>
-        <p>Company website build with DNS, hosting and email signature management.</p>
-        <div class="tags"><span class="tag">Cloudflare</span><span class="tag">WordPress</span><span class="tag">Deployment</span></div>
-      </div>
-      <div class="card">
-        <h3>Capiofin Prototype</h3>
-        <p>Multi-page finance company prototype with modern Vite-based frontend.</p>
-        <div class="tags"><span class="tag">React</span><span class="tag">Vite</span><span class="tag">Prototype</span></div>
-      </div>
-      <div class="card">
-        <h3>3DS Homebrew Tools</h3>
-        <p>C-based homebrew experiments for the Nintendo 3DS — graphics and audio utilities.</p>
-        <div class="tags"><span class="tag">C</span><span class="tag">3DS Homebrew</span><span class="tag">Graphics</span></div>
-      </div>
-    </div>
-  </div>
-</section>
+  <footer>
+    <span class="green">● GATE OPEN</span> — identity verified by cloudflare access · <a href="https://github.com/OMEGALULUL" target="_blank">github</a> · <a href="mailto:christophervisser05@gmail.com">email</a> · ztna demo for BG ITversity Connect
+  </footer>
 
-<section>
-  <div class="container">
-    <h2>Demo Project <small>This very page</small></h2>
-    <div class="ztna-note">
-      <p><strong>You're looking at a Zero Trust Network Access demo.</strong></p>
-      <p>This site is hosted on GitHub Pages and published behind a Cloudflare Access policy. Nobody gets here without first proving their identity — you entered your email and received a one-time code (or your session was reused). That's clientless ZTNA: identity-based access control enforced at the edge, no VPN, no client software.</p>
-      <p style="margin-top:10px;">Policy: <code>Email OTP</code> · Session: <code>24h</code> · Enforced by: <code>Cloudflare Access</code></p>
-      <ol class="steps">
-        <li>You request <code>ztna.blueberryservices.co.za</code></li>
-        <li>Cloudflare Access checks for a valid session cookie</li>
-        <li>No session → redirect to the Access login, email + one-time code</li>
-        <li>Identity verified → page served from GitHub Pages origin</li>
-        <li>Unauthenticated requests never reach the origin — ever</li>
-      </ol>
-    </div>
-  </div>
-</section>
+</div>
 
-<section>
-  <div class="container">
-    <h2>Contact <small>Let's build something</small></h2>
-    <div class="contact-links">
-      <a class="btn btn-primary" href="https://github.com/OMEGALULUL" target="_blank">GitHub</a>
-      <a class="btn btn-ghost" href="mailto:chris@blueberryservices.co.za">Email me</a>
-      <a class="btn btn-ghost" href="https://blueberryservices.co.za" target="_blank">Blueberry Services</a>
-    </div>
-  </div>
-</section>
+<div class="tmux">
+  <span><span class="green">[chris@ztna:~]</span> 0:bash* &quot;ztna.blueberryservices.co.za&quot;</span>
+  <span class="ok" id="tmux-gate">● GATE OPEN</span>
+</div>
 
-<footer>
-  <div class="container">
-    <p><span class="shield">&#128737;</span> This page is protected by Cloudflare Zero Trust Access</p>
-    <p style="margin-top:6px;">Built for BG ITversity Connect</p>
-  </div>
-</footer>
+<div class="boot" id="boot">
+  <pre id="boot-banner"></pre>
+  <div class="log" id="boot-log"></div>
+</div>
 
 <script>
   function getCookie(name) {
-    const m = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([.$?*|{}()\[\]\\\/+^])/g, "\\$1") + "=([^;]*)"));
+    var m = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([.$?*|{}()\[\]\\\/+^])/g, "\\$1") + "=([^;]*)"));
     return m ? decodeURIComponent(m[1]) : null;
   }
-  const email = getCookie("cf-access-authenticated-user-email");
-  const el = document.getElementById("auth-email");
-  if (email) {
-    el.textContent = email;
-  } else {
-    el.textContent = "Session verified — email hidden (incognito or reused session)";
-  }
+  var email = getCookie("cf-access-authenticated-user-email");
+
+  (function () {
+    var FILES = {
+      "/about.txt": "IT student + web developer at Blueberry Services.\ncloudflare admin (dns, workers, zero trust access), client sites,\nhosting, systems & network support. working toward an IT diploma.",
+      "/skills.txt": "web: html/css, javascript, react (basic)\ncloudflare: dns, workers, zero trust access, pages\nscripting: python, powershell, bash\ndata: access, sql\nother: c (beginner), networking basics, windows admin, 3d tools",
+      "/experience.txt": "2026-  Blueberry Services - IT & web services\n2026    Skybre - web development\nnow     IT Diploma - databases, web programming, networking",
+      "/contact.txt": "github:  https://github.com/OMEGALULUL\nemail:   christophervisser05@gmail.com\nweb:     https://blueberryservices.co.za",
+      "/projects/knockout.txt": "Knockout Pub & Grill (2026)\nboxing-themed restaurant site. html/css/js.\nhttps://github.com/Blueberry-Technologies/Knockout-Pub---Grill",
+      "/projects/skybre.txt": "Skybre (2026)\nmarketing site build - dns, hosting, email signatures,\npartner integrations for a local company.",
+      "/projects/capiofin.txt": "Capiofin prototype (2026)\nmulti-page finance company prototype, vite + react.",
+      "/projects/homebrew.txt": "3DS homebrew (2026)\nc experiments for the nintendo 3ds. graphics and audio\nutilities. just for fun.",
+      "/projects/ztna.txt": "ZTNA Connect (2026) - this page\ngithub pages served behind a cloudflare access email-otp gate.\nyou authenticated to read this file.",
+      "/etc/os-release": "NAME=\"ZTNA-OS\"\nVERSION=\"1.0 (edge)\"\nID=ztna-os\nPRETTY_NAME=\"ZTNA-OS 1.0 (github-pages origin)\"",
+      "/etc/hostname": "ztna",
+      "/etc/motd": "welcome to ztna. you are verified.",
+      "/etc/passwd": "root:x:0:0:root:/identity:/bin/access\nchris:x:1000:1000:Christopher:/identity/chris:/bin/bash\nvisitor:x:1001:1001:gate-guest:/dev/null:/usr/sbin/nologin",
+      "/proc/version": "ZTNA-OS version 1.0 (cloudflare@edge) (gcc-identity 24.7) #1 SMP PREEMPT_DYNAMIC\n# compiled for: verify everything, trust nothing"
+    };
+    var DIRS = {
+      "/": ["about.txt", "skills.txt", "experience.txt", "contact.txt", "projects/", "etc/", "proc/"],
+      "/projects/": ["knockout.txt", "skybre.txt", "capiofin.txt", "homebrew.txt", "ztna.txt"],
+      "/etc/": ["os-release", "hostname", "motd", "passwd"],
+      "/proc/": ["version"]
+    };
+    var COMMENTS = {
+      "about.txt": "who i am",
+      "skills.txt": "tools i use",
+      "experience.txt": "where i've worked",
+      "contact.txt": "how to reach me",
+      "projects/": "stuff i've built",
+      "knockout.txt": "boxing-themed restaurant site",
+      "skybre.txt": "marketing site + dns work",
+      "capiofin.txt": "finance prototype",
+      "homebrew.txt": "c experiments, just for fun",
+      "ztna.txt": "this page, explained",
+      "etc/": "system files (yes, fake)",
+      "proc/": "kernel internals (also fake)",
+      "os-release": "the distro",
+      "hostname": "who you're on",
+      "motd": "message of the day",
+      "passwd": "who lives here",
+      "version": "kernel version"
+    };
+    var CMDS = ["help", "ls", "cd", "cat", "pwd", "whoami", "neofetch", "curl", "ssh", "open", "echo", "date", "history", "clear", "sudo", "tree", "exit", "man", "apt", "uname", "ping", "vim", "nano", "top", "df", "matrix", "snake", "figlet", "cowsay", "weather", "clock", "fortune", "coffee", "sl", "hack", "42", "godmode", "rm", "checksec", "reboot"];
+
+    var body = document.getElementById("vt-body");
+    var input = document.getElementById("vt-input");
+    var promptEl = document.getElementById("vt-prompt");
+    var cwd = "/";
+    var hist = [];
+    var histIdx = -1;
+    var email2 = email || "verified session (identity hidden)";
+
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+    function clean(s) {
+      return s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "");
+    }
+    function trimOutput() {
+      while (body.children.length > 400) {
+        var first = body.firstChild;
+        if (first.id === "snake-out" || first.tagName === "CANVAS") {
+          body.appendChild(first);
+          continue;
+        }
+        body.removeChild(first);
+      }
+    }
+    function print(html) {
+      var d = document.createElement("div");
+      d.className = "vt-out";
+      d.innerHTML = html;
+      body.appendChild(d);
+      body.scrollTop = body.scrollHeight;
+      trimOutput();
+    }
+    function promptHtml() {
+      var p = cwd === "/" ? "~" : "~" + cwd.replace(/\/$/, "");
+      return "<span class='u'>chris@ztna</span>:<span class='p'>" + p + "</span>$";
+    }
+    function resolve(p) {
+      var parts = (p.indexOf("/") === 0 ? p : cwd + p).split("/");
+      var out = [];
+      for (var i = 0; i < parts.length; i++) {
+        if (parts[i] === "" || parts[i] === ".") continue;
+        if (parts[i] === "..") { out.pop(); continue; }
+        out.push(parts[i]);
+      }
+      return "/" + out.join("/") + (p.slice(-1) === "/" ? "/" : "");
+    }
+    function pad(n, w) { return (n + "                    ").slice(0, w); }
+    function listHtml(dir) {
+      var out = [];
+      DIRS[dir].forEach(function (n) {
+        var full = dir + n;
+        if (DIRS[full]) out.push("<span class='blue'>" + esc(n) + "</span>");
+        else out.push(esc(n));
+      });
+      return out.join("&nbsp;&nbsp;");
+    }
+
+    var FONT = {
+      A: [" ██  ", "█  █ ", "████ ", "█  █ ", "█  █ "],
+      B: ["███  ", "█  █ ", "███  ", "█  █ ", "███  "],
+      C: [" ███ ", "█    ", "█    ", "█    ", " ███ "],
+      D: ["███  ", "█  █ ", "█  █ ", "█  █ ", "███  "],
+      E: ["████ ", "█    ", "███  ", "█    ", "████ "],
+      F: ["████ ", "█    ", "███  ", "█    ", "█    "],
+      G: [" ███ ", "█    ", "█ ██ ", "█  █ ", " ███ "],
+      H: ["█  █ ", "█  █ ", "████ ", "█  █ ", "█  █ "],
+      I: ["███  ", " █   ", " █   ", " █   ", "███  "],
+      J: ["  ██ ", "   █ ", "   █ ", "█  █ ", " ██  "],
+      K: ["█  █ ", "█ █  ", "██   ", "█ █  ", "█  █ "],
+      L: ["█    ", "█    ", "█    ", "█    ", "████ "],
+      M: ["█   █", "██ ██", "█ █ █", "█   █", "█   █"],
+      N: ["█   █", "██  █", "█ █ █", "█  ██", "█   █"],
+      O: [" ██  ", "█  █ ", "█  █ ", "█  █ ", " ██  "],
+      P: ["███  ", "█  █ ", "███  ", "█    ", "█    "],
+      Q: [" ██  ", "█  █ ", "█  █ ", "█ ██ ", " █ █ "],
+      R: ["███  ", "█  █ ", "███  ", "█ █  ", "█  █ "],
+      S: [" ███ ", "█    ", " ██  ", "   █ ", "███  "],
+      T: ["█████", "  █  ", "  █  ", "  █  ", "  █  "],
+      U: ["█  █ ", "█  █ ", "█  █ ", "█  █ ", " ██  "],
+      V: ["█  █ ", "█  █ ", "█  █ ", " ██  ", " ██  "],
+      W: ["█   █", "█   █", "█ █ █", "██ ██", "█   █"],
+      X: ["█  █ ", " ██  ", " █   ", " ██  ", "█  █ "],
+      Y: ["█  █ ", " ██  ", " █   ", " █   ", " █   "],
+      Z: ["████ ", "   █ ", "  █  ", " █   ", "████ "],
+      "0": [" ██  ", "█  █ ", "█  █ ", "█  █ ", " ██  "],
+      "1": [" █   ", "██   ", " █   ", " █   ", "███  "],
+      "2": [" ██  ", "   █ ", " ██  ", "█    ", "████ "],
+      "3": ["███  ", "   █ ", " ██  ", "   █ ", "███  "],
+      "4": ["█  █ ", "█  █ ", "████ ", "   █ ", "   █ "],
+      "5": ["████ ", "█    ", "███  ", "   █ ", "███  "],
+      "6": [" ██  ", "█    ", "███  ", "█  █ ", " ██  "],
+      "7": ["████ ", "   █ ", "  █  ", " █   ", " █   "],
+      "8": [" ██  ", "█  █ ", " ██  ", "█  █ ", " ██  "],
+      "9": [" ██  ", "█  █ ", " ███ ", "   █ ", " ██  "],
+      " ": ["     ", "     ", "     ", "     ", "     "]
+    };
+    function figlet(text) {
+      var t = text.toUpperCase().split("");
+      if (t.length > 24) return "figlet: text too long (max 24 chars)";
+      var lines = ["", "", "", "", ""];
+      for (var i = 0; i < t.length; i++) {
+        var glyph = FONT[t[i]] || FONT[" "];
+        for (var r = 0; r < 5; r++) lines[r] += glyph[r] + " ";
+      }
+      var max = 0;
+      for (var r = 0; r < 5; r++) if (lines[r].length > max) max = lines[r].length;
+      for (var r = 0; r < 5; r++) lines[r] = lines[r] + " ".repeat(max - lines[r].length);
+      return lines.join("\n");
+    }
+
+    var FORTUNE = [
+      "the gate does not sleep. neither should your demos.",
+      "a vpn is a castle wall. zero trust is a bouncer at every door.",
+      "there is no such thing as an inside anymore.",
+      "you can't curl what you can't see. — cloudflare, probably",
+      "email otp: the one password you don't have to remember.",
+      "the best defense is a policy that says no.",
+      "rm -rf / is a lifestyle, not a solution.",
+      "if you can ping it, you can own it. so we block icmp.",
+      "fortune: the origin is hidden, and that's the point."
+    ];
+
+    var timers = [];
+    var snake = null;
+    var audio = null;
+    function beep() {
+      try {
+        audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+        var o = audio.createOscillator();
+        var g = audio.createGain();
+        o.connect(g);
+        g.connect(audio.destination);
+        o.type = "square";
+        o.frequency.value = 880;
+        g.gain.setValueAtTime(0.04, audio.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.08);
+        o.start();
+        o.stop(audio.currentTime + 0.08);
+      } catch (e) {}
+    }
+    function stopAll() {
+      timers.forEach(clearInterval);
+      timers = [];
+      var cv = document.getElementById("matrix-canvas");
+      if (cv) cv.remove();
+      if (snake && !snake.over) { clearInterval(snake.tick); }
+      snake = null;
+    }
+
+    function startMatrix() {
+      stopAll();
+      var c = document.createElement("canvas");
+      c.id = "matrix-canvas";
+      c.style.width = "100%";
+      c.style.height = "260px";
+      body.appendChild(c);
+      var ctx = c.getContext("2d");
+      c.width = body.clientWidth;
+      c.height = 260;
+      var chars = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄ0123456789ABCDEF";
+      var size = 14;
+      var cols = Math.floor(c.width / size);
+      var drops = [];
+      for (var i = 0; i < cols; i++) drops[i] = Math.floor(Math.random() * -30);
+      timers.push(setInterval(function () {
+        ctx.fillStyle = "rgba(0,0,0,0.07)";
+        ctx.fillRect(0, 0, c.width, c.height);
+        ctx.font = size + "px monospace";
+        for (var i = 0; i < cols; i++) {
+          var ch = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillStyle = Math.random() > 0.96 ? "#d7ffd7" : "#4e9a06";
+          ctx.fillText(ch, i * size, drops[i] * size);
+          if (drops[i] * size > c.height && Math.random() > 0.975) drops[i] = 0;
+          drops[i]++;
+        }
+      }, 55));
+      print("<span class='dim'># press Ctrl+C... i mean, type 'clear' to stop</span>");
+    }
+
+    function startSnake() {
+      stopAll();
+      snake = {
+        dir: { x: 1, y: 0 }, pending: { x: 1, y: 0 },
+        cells: [{ x: 10, y: 7 }, { x: 9, y: 7 }, { x: 8, y: 7 }],
+        food: { x: 25, y: 7 }, W: 40, H: 15,
+        score: 0, tick: null, over: false
+      };
+      var d = document.createElement("div");
+      d.className = "vt-out";
+      d.id = "snake-out";
+      body.appendChild(d);
+      print("<span class='dim'># arrows/wasd to move · q to quit · eat the * · don't hit the walls</span>");
+      snakeRender();
+      snake.tick = setInterval(snakeStep, 140);
+    }
+    function snakeStep() {
+      if (!snake || snake.over) return;
+      snake.dir = snake.pending;
+      var head = { x: snake.cells[0].x + snake.dir.x, y: snake.cells[0].y + snake.dir.y };
+      if (head.x < 0 || head.y < 0 || head.x >= snake.W || head.y >= snake.H ||
+          snake.cells.some(function (c) { return c.x === head.x && c.y === head.y; })) {
+        snake.over = true;
+        clearInterval(snake.tick);
+        print("<span class='accent'>GAME OVER</span> — score: " + snake.score + ". run <span class='accent'>snake</span> to retry.");
+        return;
+      }
+      snake.cells.unshift(head);
+      if (head.x === snake.food.x && head.y === snake.food.y) {
+        snake.score++;
+        var free = [];
+        for (var y = 0; y < snake.H; y++)
+          for (var x = 0; x < snake.W; x++)
+            if (!snake.cells.some(function (c) { return c.x === x && c.y === y; })) free.push({ x: x, y: y });
+        snake.food = free[Math.floor(Math.random() * free.length)];
+      } else {
+        snake.cells.pop();
+      }
+      snakeRender();
+    }
+    function snakeRender() {
+      var g = [];
+      for (var y = 0; y < snake.H; y++) {
+        var row = "";
+        for (var x = 0; x < snake.W; x++) {
+          var isHead = snake.cells[0].x === x && snake.cells[0].y === y;
+          var isBody = !isHead && snake.cells.some(function (c) { return c.x === x && c.y === y; });
+          var isFood = snake.food.x === x && snake.food.y === y;
+          row += isHead ? "<span class='accent'>@</span>" : isBody ? "#" : isFood ? "<span class='green'>*</span>" : " ";
+        }
+        g.push(row);
+      }
+      var el = document.getElementById("snake-out");
+      if (el) {
+        el.innerHTML = "<span class='dim'>score: " + snake.score + "</span><br>" + g.join("\n");
+        body.scrollTop = body.scrollHeight;
+      }
+    }
+
+    var SL_TRAIN = [
+      "      ====        ________                ___________",
+      "  _D _|  |_______/        \\__I_I_____===__|_________|",
+      "   |(_)---  |   H\\________/ |   |        =|___ ___|",
+      "  |      |  |   H  |  |     |   |         ||_| |_||",
+      "  | |_|__|  |   H__|__|_____|___|_________||_| |_||"
+    ];
+    function startSl() {
+      stopAll();
+      var d = document.createElement("div");
+      d.className = "vt-out";
+      body.appendChild(d);
+      var frame = 0;
+      timers.push(setInterval(function () {
+        var offset = " ".repeat((frame % 5) * 2);
+        var smoke = frame % 2 === 0 ? " <span class='dim'>( ) ( )</span>" : "";
+        d.innerHTML = offset + SL_TRAIN.join("\n" + offset) + "<br>" + smoke + "<span class='dim'># why is it so hard to type ls?</span>";
+        frame++;
+        body.scrollTop = body.scrollHeight;
+      }, 170));
+    }
+
+    function startClock() {
+      stopAll();
+      var d = document.createElement("div");
+      d.className = "vt-out";
+      body.appendChild(d);
+      function tick() {
+        var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        var n = new Date();
+        var hh = String(n.getHours()).padStart(2, "0");
+        var mm = String(n.getMinutes()).padStart(2, "0");
+        var ss = String(n.getSeconds()).padStart(2, "0");
+        d.textContent = days[n.getDay()] + " " + months[n.getMonth()] + " " + n.getDate() + " " + hh + ":" + mm + ":" + ss + " " + n.getFullYear();
+      }
+      tick();
+      timers.push(setInterval(tick, 1000));
+    }
+
+    function startCoffee() {
+      stopAll();
+      var d = document.createElement("div");
+      d.className = "vt-out";
+      body.appendChild(d);
+      var steps = [
+        "brewing coffee...",
+        "[###                ] 15%",
+        "[##########         ] 55%",
+        "[################   ] 85%",
+        "[####################] 100%",
+        "coffee served. the gate approves."
+      ];
+      var i = 0;
+      d.textContent = steps[0];
+      timers.push(setInterval(function () {
+        i++;
+        if (i < steps.length) d.textContent = steps[i];
+        else clearInterval(timers.pop());
+      }, 350));
+    }
+
+    function boot() {
+      var overlay = document.getElementById("boot");
+      var banner = document.getElementById("boot-banner");
+      var log = document.getElementById("boot-log");
+      var PENGUIN = "     .--.\n" +
+                    "    |o_o |\n" +
+                    "    |:_/ |\n" +
+                    "   //   \\ \\\n" +
+                    "  (|     | )\n" +
+                    "  /'\\_   _/`\\\n" +
+                    "  \\___)=(___/";
+      banner.innerHTML = figlet("LUNIX") + "\n\n<span class='peng'>" + PENGUIN + "</span>";
+      log.innerHTML = "";
+      overlay.classList.remove("done");
+      var lines = [
+        { t: "0.000000", m: "Lunix 1.0 (edge edition) — zero trust BIOS: no secrets, only vibes" },
+        { t: "0.145912", m: "Memory: 512MB identity / 0MB vpn / 0MB doubt" },
+        { t: "0.301234", m: "Verifying you at the gate", ok: true },
+        { t: "0.457890", m: "Mounting /identity (read-only, as all things should be)", ok: true },
+        { t: "0.612345", m: "Loading access policy: email otp + everyone", ok: true },
+        { t: "0.789012", m: "Network: 100% cloudflare edge, 0% exposed origin", ok: true },
+        { t: "0.934567", m: "Starting bash with unlimited swagger", ok: true },
+        { t: "1.123456", m: "Checking sudoers... chris is NOT in the sudoers file", fatal: true },
+        { t: "1.345678", m: "Reaching multi-user.target... you. you are the target.", ok: true }
+      ];
+      var i = 0;
+      var iv = setInterval(function () {
+        if (i >= lines.length) {
+          clearInterval(iv);
+          var w = document.createElement("div");
+          w.className = "line";
+          w.innerHTML = "<span class='ok'>Lunix 1.0</span> — type <span class='ok'>help</span>, or just wander around. it's fine.";
+          log.appendChild(w);
+          setTimeout(function () {
+            overlay.classList.add("done");
+            input.focus();
+          }, 900);
+          return;
+        }
+        var l = lines[i++];
+        var d = document.createElement("div");
+        d.className = "line";
+        var status = l.ok ? "[  OK  ] " : l.fatal ? "[ DENY ] " : "        ";
+        var color = l.ok ? "ok" : l.fatal ? "fatal" : "";
+        d.innerHTML = "[    " + l.t + "] " + (color ? "<span class='" + color + "'>" + status + "</span>" : status) + "<span class='lbl'>" + esc(l.m) + "</span>";
+        log.appendChild(d);
+        if (i === 1) setTimeout(function () { }, 0);
+      }, 280);
+    }
+
+    function startWeather() {
+      print("<span class='dim'>fetching weather…</span>");
+      fetch("https://wttr.in/?format=j1").then(function (r) { return r.json(); }).then(function (j) {
+        var cc = j.current_condition[0];
+        var area = j.nearest_area[0];
+        var name = area.areaName[0].value + ", " + area.country[0].value;
+        print("<span class='accent'>" + esc(name) + "</span><br>" +
+              esc(cc.weatherDesc[0].value) + " · " + cc.temp_C + "°C (feels " + cc.FeelsLikeC + "°C)<br>" +
+              "humidity: " + cc.humidity + "% · wind: " + cc.windspeedKmph + " km/h<br>" +
+              "<span class='dim'>observed: " + esc(cc.localObsDateTime) + "</span>");
+      }).catch(function () {
+        print("<span class='accent'>weather: could not reach wttr.in</span><br><span class='dim'># the edge is up, the weather api is not. try 'fortune'</span>");
+      });
+    }
+
+    function startCowsay(text) {
+      var wrapped = text.match(/.{1,34}(\s|$)/g) || [text];
+      var width = Math.max.apply(null, wrapped.map(function (w) { return w.trim().length; }));
+      var border = "\u2500".repeat(width + 2);
+      var lines = [];
+      if (wrapped.length === 1) {
+        lines.push("\u2572 " + wrapped[0].trim().padEnd(width) + " \u2571");
+      } else {
+        for (var i = 0; i < wrapped.length; i++) {
+          var w = wrapped[i].trim();
+          var edgeL = i === 0 ? "/" : i === wrapped.length - 1 ? "\\" : "|";
+          var edgeR = i === 0 ? "\\" : i === wrapped.length - 1 ? "/" : "|";
+          lines.push(edgeL + " " + w.padEnd(width) + " " + edgeR);
+        }
+      }
+      var out = " " + border + "\n" + lines.join("\n") + "\n " + border + "\n" +
+        "        \\   ^__^\n" +
+        "         \\  (oo)\\_______\n" +
+        "            (__)\\       )\\/\\\n" +
+        "                ||----w |\n" +
+        "                ||     ||";
+      print(esc(out).replace(/\n/g, "<br>"));
+    }
+    function run(line) {
+      var parts = line.trim().split(/\s+/);
+      var cmd = parts[0] || "";
+      var args = parts.slice(1);
+
+      switch (cmd) {
+        case "help":
+          print("usage: browse this site like a filesystem<br>" +
+                "&nbsp;&nbsp;<span class='accent'>ls</span> [-la]&nbsp;&nbsp;<span class='accent'>cd</span> &lt;dir&gt;&nbsp;&nbsp;<span class='accent'>cat</span> &lt;file&gt;&nbsp;&nbsp;<span class='accent'>pwd</span><br>" +
+                "&nbsp;&nbsp;<span class='accent'>whoami</span>&nbsp;&nbsp;<span class='accent'>neofetch</span>&nbsp;&nbsp;<span class='accent'>curl</span>&nbsp;&nbsp;<span class='accent'>ssh</span>&nbsp;&nbsp;<span class='accent'>open</span> &lt;project&gt;<br>" +
+                "&nbsp;&nbsp;<span class='accent'>echo</span>&nbsp;&nbsp;<span class='accent'>date</span>&nbsp;&nbsp;<span class='accent'>history</span>&nbsp;&nbsp;<span class='accent'>clear</span>&nbsp;&nbsp;<span class='accent'>man</span>&nbsp;&nbsp;<span class='accent'>uname</span>&nbsp;&nbsp;<span class='accent'>ping</span><br>" +
+                "&nbsp;&nbsp;<span class='accent'>hostname</span>&nbsp;&nbsp;<span class='accent'>env</span>&nbsp;&nbsp;<span class='accent'>echo \$PS1</span>&nbsp;&nbsp;<span class='accent'>cat /etc/os-release</span><br>" +
+                "&nbsp;&nbsp;<span class='accent'>sudo</span>&nbsp;&nbsp;<span class='accent'>apt</span>&nbsp;&nbsp;<span class='accent'>vim</span>&nbsp;&nbsp;<span class='accent'>top</span>&nbsp;&nbsp;<span class='accent'>tree</span>&nbsp;&nbsp;<span class='accent'>exit</span><br>" +
+                "games &amp; fun:<br>" +
+                "&nbsp;&nbsp;<span class='accent'>matrix</span>&nbsp;&nbsp;<span class='accent'>snake</span>&nbsp;&nbsp;<span class='accent'>sl</span>&nbsp;&nbsp;<span class='accent'>figlet</span> &lt;text&gt;&nbsp;&nbsp;<span class='accent'>cowsay</span> &lt;text&gt;<br>" +
+                "&nbsp;&nbsp;<span class='accent'>weather</span>&nbsp;&nbsp;<span class='accent'>clock</span>&nbsp;&nbsp;<span class='accent'>fortune</span>&nbsp;&nbsp;<span class='accent'>coffee</span>&nbsp;&nbsp;<span class='accent'>hack</span>&nbsp;&nbsp;<span class='accent'>42</span>&nbsp;&nbsp;<span class='accent'>godmode</span>&nbsp;&nbsp;<span class='accent'>reboot</span>");
+          break;
+        case "ls": {
+          var la = args.indexOf("-la") !== -1 || args.indexOf("-l") !== -1;
+          var target = args.length && args[args.length - 1].indexOf("-") !== 0 ? args[args.length - 1] : "";
+          var dir = resolve(target || ".");
+          if (!DIRS[dir]) { print("ls: cannot access '" + esc(target) + "': No such file or directory"); break; }
+          if (la) {
+            DIRS[dir].forEach(function (n) {
+              var full = dir + n;
+              if (DIRS[full]) print("drwxr-xr-x  3 chris chris 4096 <span class='blue'>" + esc(n) + "</span>");
+              else print("-rw-r--r--  1 chris chris " + pad(String(FILES[full].length), 4) + " " + esc(n));
+            });
+          } else {
+            DIRS[dir].forEach(function (n) {
+              var full = dir + n;
+              var colored = DIRS[full] ? "<span class='blue'>" + esc(n) + "</span>" : esc(n);
+              print(pad(colored, 18) + "<span class='dim'>" + esc(COMMENTS[n] || "") + "</span>");
+            });
+          }
+          break;
+        }
+        case "cd": {
+          var d = resolve(args[0] || "/");
+          if (!DIRS[d]) { print("cd: no such file or directory: " + esc(args[0] || "")); break; }
+          cwd = d;
+          promptEl.innerHTML = promptHtml();
+          document.title = "chris@ztna: " + (cwd === "/" ? "~" : "~" + cwd.replace(/\/$/, "")) + " — bash";
+          break;
+        }
+        case "cat": {
+          if (!args[0]) { print("cat: missing operand — try <span class='accent'>cat about.txt</span>"); break; }
+          var f = resolve(args[0]);
+          if (!FILES[f]) { print("cat: " + esc(args[0]) + ": No such file or directory"); break; }
+          print(esc(FILES[f]).replace(/\n/g, "<br>"));
+          break;
+        }
+        case "pwd":
+          print(esc(cwd));
+          break;
+        case "whoami":
+          print("<span class='accent'>" + esc(email2) + "</span><br><span class='dim'># verified by cloudflare access · email otp · session 24h</span>");
+          break;
+        case "neofetch":
+          print("        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  chris@ztna<br>" +
+                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  ------------<br>" +
+                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  OS: ZTNA-OS 1.0 (edge)<br>" +
+                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Origin: github pages<br>" +
+                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Shell: access-otp 24h<br>" +
+                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Memory: 100% identity, 0% vpn<br>" +
+                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Uptime: since you authenticated<br>" +
+                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Identity: " + esc(email2));
+          break;
+        case "curl":
+          print("<span class='http'>HTTP/2 302</span><br>" +
+                "<span class='loc'>location: https://dry-rice-70ec.cloudflareaccess.com/cdn-cgi/access/login/ztna.blueberryservices.co.za?kid=...</span><br>" +
+                "<span class='loc'>www-authenticate: Cloudflare-Access</span><br>" +
+                "<span class='dim'># that's what unauthenticated visitors get</span>");
+          break;
+        case "ssh":
+          print("<span class='accent'>identity verified</span> — cloudflare access · email otp · session 24h<br><span class='dim'># no keys, no passwords, just a one-time code and a session</span>");
+          break;
+        case "open": {
+          var map = { knockout: "https://github.com/Blueberry-Technologies/Knockout-Pub---Grill", skybre: "https://skybre.co.za", capiofin: "https://github.com/OMEGALULUL", homebrew: "https://github.com/OMEGALULUL", ztna: "https://ztna.blueberryservices.co.za" };
+          var k = (args[0] || "").toLowerCase();
+          if (!map[k]) { print("open: unknown project — try: knockout, skybre, capiofin, homebrew, ztna"); break; }
+          window.open(map[k], "_blank");
+          print("opening " + esc(k) + " in a new tab…");
+          break;
+        }
+        case "echo": {
+          var vars = { PS1: "chris@ztna:\\w$", HOME: "/identity", USER: "chris", HOSTNAME: "ztna", SHELL: "/bin/access", PATH: "/identity/bin:/edge/bin", PWD: cwd };
+          var out = args.join(" ").replace(/\$(\w+)/g, function (_, v) {
+            return vars[v] !== undefined ? vars[v] : "";
+          });
+          print(esc(out));
+          break;
+        }
+        case "date":
+          print(esc(new Date().toString()));
+          break;
+        case "history":
+          hist.forEach(function (h, i) { print(String(i + 1).padStart(4) + "  " + esc(h)); });
+          break;
+        case "hostname":
+          print("ztna");
+          break;
+        case "env":
+          print("HOME=/identity<br>USER=chris<br>HOSTNAME=ztna<br>SHELL=/bin/access<br>PATH=/identity/bin:/edge/bin<br>SESSION=email-otp (24h)<br>IDENTITY=" + esc(email2));
+          break;
+        case "clear":
+          stopAll();
+          body.innerHTML = "";
+          break;
+        case "man":
+          print("<span class='dim'>No manual entry for '" + esc(args[0] || "") + "'<br># this is a fake terminal, type help</span>");
+          break;
+        case "apt":
+          print("Reading package lists... Done<br><span class='accent'>E: Unable to locate package root</span><br><span class='dim'># zero trust means nobody gets root</span>");
+          break;
+        case "uname":
+          if (args[0] === "-a") print("ZTNA-OS ztna 1.0 #1 SMP PREEMPT_DYNAMIC edge-2026.08 (cloudflare-access) x86_64");
+          else print("ZTNA-OS 1.0 (github-pages/cloudflare-access)");
+          break;
+        case "ping":
+          print("ping: zero trust policy does not allow icmp.<br><span class='dim'># you can't ping what you can't see. try 'curl'</span>");
+          break;
+        case "vim":
+          print("why would you vim inside a webpage?<br><span class='dim'># and no, you can't :q out of a zero trust policy</span>");
+          break;
+        case "nano":
+          print("nano: read-only origin. this filesystem is served, not owned.");
+          break;
+        case "top":
+          print("top: this is a static site. there are no processes.<br>go outside.");
+          break;
+        case "df":
+          print("Filesystem   Size  Used Avail Use% Mounted on<br>edge         24h   0%   100%   0% /identity<br><span class='dim'># every request mounts at /identity, then dies if unverified</span>");
+          break;
+        case "sudo":
+          if (args[0] === "rm" && args[1] === "-rf" && args[2] === "/") {
+            print("nice try. this filesystem is immutable, like a zero trust policy.<br><span class='dim'># rm -rf / doesn't work when nobody has root</span>");
+          } else {
+            print("chris is not in the sudoers file. this incident will be reported.<br><span class='dim'># zero trust means nobody gets root</span>");
+          }
+          break;
+        case "rm":
+          print("rm: no permission. the gate decides what dies here.");
+          break;
+        case "matrix":
+          startMatrix();
+          break;
+        case "snake":
+          startSnake();
+          break;
+        case "figlet": {
+          if (!args[0]) { print("figlet: missing operand — try <span class='accent'>figlet ZTNA</span>"); break; }
+          print(esc(figlet(args.join(" "))).replace(/\n/g, "<br>"));
+          break;
+        }
+        case "cowsay": {
+          if (!args[0]) { print("cowsay: missing operand — try <span class='accent'>cowsay moo</span>"); break; }
+          startCowsay(args.join(" "));
+          break;
+        }
+        case "weather":
+          startWeather();
+          break;
+        case "clock":
+          startClock();
+          break;
+        case "fortune":
+          print(esc(FORTUNE[Math.floor(Math.random() * FORTUNE.length)]));
+          break;
+        case "coffee":
+          startCoffee();
+          break;
+        case "sl":
+          startSl();
+          break;
+        case "hack":
+          print("hacking the mainframe...<br>[<span class='green'>====================</span>] 100%<br><span class='accent'>access granted: " + esc(email2) + "</span><br><span class='dim'># you were verified before you even started. zero trust is fast.</span>");
+          break;
+        case "42":
+          print("the answer to life, the universe, and everything is 42.<br><span class='dim'># also the number of the route you took to get here.</span>");
+          break;
+        case "godmode":
+          print("godmode enabled.<br><span class='dim'># you were already in it — identity verified at the edge.</span>");
+          break;
+        case "reboot":
+          stopAll();
+          body.innerHTML = "";
+          cwd = "/";
+          hist = [];
+          histIdx = -1;
+          promptEl.innerHTML = promptHtml();
+          document.title = "chris@ztna: ~ — bash";
+          boot();
+          break;
+        case "checksec":
+          print("hardening report:<br>" +
+                "&nbsp;&nbsp;\u2713 csp: enforced via meta tag — no external scripts, frames, or forms<br>" +
+                "&nbsp;&nbsp;\u2713 xss: every output path escaped (esc on all injection points)<br>" +
+                "&nbsp;&nbsp;\u2713 input: control chars stripped, length capped at 200<br>" +
+                "&nbsp;&nbsp;\u2713 cookies: read-only — never written or forwarded<br>" +
+                "&nbsp;&nbsp;\u2713 links: whitelist only (open command)<br>" +
+                "&nbsp;&nbsp;\u2713 output: capped at 400 lines — no memory floods<br>" +
+                "&nbsp;&nbsp;\u2713 referrer: no-referrer — nothing leaks outbound<br>" +
+                "<span class='dim'># try it: echo &lt;img src=x onerror=alert(1)&gt; — nothing happens</span>");
+          break;
+        case "exit":
+          print("you can close the tab. the gate will still be here.");
+          break;
+        case "tree":
+          print("<span class='path'>/</span><br>&nbsp;&nbsp;\u251c\u2500\u2500 about.txt<br>&nbsp;&nbsp;\u251c\u2500\u2500 skills.txt<br>&nbsp;&nbsp;\u251c\u2500\u2500 experience.txt<br>&nbsp;&nbsp;\u251c\u2500\u2500 contact.txt<br>&nbsp;&nbsp;\u2514\u2500\u2500 <span class='blue'>projects/</span><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\u251c\u2500\u2500 knockout.txt<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\u251c\u2500\u2500 skybre.txt<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\u251c\u2500\u2500 capiofin.txt<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\u251c\u2500\u2500 homebrew.txt<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\u2514\u2500\u2500 ztna.txt");
+          break;
+        case "":
+          break;
+        default:
+          beep();
+          print("<span class='accent'>" + esc(cmd) + ": command not found</span><br><span class='dim'># try 'help', or tab-complete your way to glory</span>");
+      }
+    }
+
+    input.addEventListener("keydown", function (e) {
+      if (e.ctrlKey && (e.key === "c" || e.key === "C")) {
+        e.preventDefault();
+        print("^C");
+        stopAll();
+        input.value = "";
+        return;
+      }
+      if (e.ctrlKey && (e.key === "l" || e.key === "L")) {
+        e.preventDefault();
+        stopAll();
+        body.innerHTML = "";
+        return;
+      }
+      if (e.ctrlKey && (e.key === "u" || e.key === "U")) {
+        e.preventDefault();
+        input.value = "";
+        return;
+      }
+      if (e.ctrlKey && (e.key === "a" || e.key === "A")) {
+        e.preventDefault();
+        input.setSelectionRange(0, 0);
+        return;
+      }
+      if (e.ctrlKey && (e.key === "e" || e.key === "E")) {
+        e.preventDefault();
+        input.setSelectionRange(input.value.length, input.value.length);
+        return;
+      }
+      if (e.key === "Home") { e.preventDefault(); input.setSelectionRange(0, 0); return; }
+      if (e.key === "End") { e.preventDefault(); input.setSelectionRange(input.value.length, input.value.length); return; }
+      if (snake && !snake.over) {
+        var k = e.key.toLowerCase();
+        if (k === "arrowup" || k === "w") { e.preventDefault(); if (snake.dir.y !== 1) snake.pending = { x: 0, y: -1 }; return; }
+        if (k === "arrowdown" || k === "s") { e.preventDefault(); if (snake.dir.y !== -1) snake.pending = { x: 0, y: 1 }; return; }
+        if (k === "arrowleft" || k === "a") { e.preventDefault(); if (snake.dir.x !== 1) snake.pending = { x: -1, y: 0 }; return; }
+        if (k === "arrowright" || k === "d") { e.preventDefault(); if (snake.dir.x !== -1) snake.pending = { x: 1, y: 0 }; return; }
+        if (k === "q") { e.preventDefault(); clearInterval(snake.tick); snake.over = true; print("<span class='dim'># snake abandoned. the food will never know.</span>"); snake = null; return; }
+        return;
+      }
+      if (e.key === "Enter") {
+        var line = clean(input.value).slice(0, 200);
+        print(promptHtml() + " " + esc(line));
+        if (line.trim()) { hist.push(line); histIdx = hist.length; }
+        run(line);
+        input.value = "";
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (histIdx > 0) { histIdx--; input.value = hist[histIdx]; }
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (histIdx < hist.length - 1) { histIdx++; input.value = hist[histIdx]; }
+        else { histIdx = hist.length; input.value = ""; }
+      } else if (e.key === "Tab") {
+        e.preventDefault();
+        var val = input.value;
+        var i = val.lastIndexOf(" ");
+        var prefix = i === -1 ? val : val.slice(i + 1);
+        var head = i === -1 ? "" : val.slice(0, i + 1);
+        var candidates;
+        if (i === -1) {
+          candidates = CMDS.filter(function (c) { return c.indexOf(prefix.toLowerCase()) === 0; });
+        } else {
+          candidates = DIRS[cwd].filter(function (n) { return n.indexOf(prefix.toLowerCase()) === 0; });
+        }
+        if (candidates.length === 1) {
+          input.value = head + candidates[0];
+        } else if (candidates.length > 1) {
+          beep();
+          print(promptHtml() + " " + esc(val));
+          print(listHtml(cwd).split("&nbsp;&nbsp;").filter(function (s) {
+            return s.toLowerCase().indexOf(prefix.toLowerCase()) === 0 || s.toLowerCase().indexOf(">" + prefix.toLowerCase()) === 0;
+          }).join("&nbsp;&nbsp;").replace(/<span class='blue'>/, "<span class='blue'>"));
+        }
+      }
+    });
+    document.querySelector(".term").addEventListener("click", function () { input.focus(); });
+
+    var banner =
+      "Welcome to <span class='accent'>ZTNA-CONNECT-OS 1.0</span> — github pages origin, cloudflare access gate<br>" +
+      "Identity: <span class='accent'>" + esc(email2) + "</span> · policy: email otp · session: 24h<br>" +
+      "<span class='dim'>try: ls · cat about.txt · whoami · curl · help</span><br>";
+    print(banner);
+    promptEl.innerHTML = promptHtml();
+    boot();
+  })();
 </script>
 
 </body>
