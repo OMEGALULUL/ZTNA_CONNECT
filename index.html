@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>chris@ztna: ~ — ZTNA Connect</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'self' https://wttr.in; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none'; media-src 'none'; font-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'self' https://wttr.in https://cloudflare-dns.com https:; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none'; media-src 'none'; font-src 'none'">
 <meta name="referrer" content="no-referrer">
 <style>
   :root {
@@ -216,7 +216,7 @@ type <span class="u">save</span> in the terminal → <span class="u">save down</
       "passwd": "who lives here",
       "version": "kernel version"
     };
-    var CMDS = ["help", "ls", "cd", "cat", "pwd", "whoami", "neofetch", "curl", "ssh", "open", "echo", "date", "history", "clear", "sudo", "tree", "exit", "man", "apt", "uname", "ping", "vim", "nano", "top", "df", "matrix", "snake", "figlet", "cowsay", "weather", "clock", "fortune", "coffee", "sl", "hack", "42", "godmode", "rm", "checksec", "save", "reboot"];
+    var CMDS = ["help", "ls", "cd", "cat", "pwd", "whoami", "neofetch", "curl", "ssh", "open", "echo", "date", "history", "clear", "sudo", "tree", "exit", "man", "apt", "uname", "ping", "vim", "nano", "top", "df", "matrix", "snake", "figlet", "cowsay", "weather", "clock", "fortune", "coffee", "sl", "hack", "42", "godmode", "rm", "checksec", "connect", "iptables", "nmap", "dig", "save", "reboot"];
 
     var body = document.getElementById("vt-body");
     var input = document.getElementById("vt-input");
@@ -224,6 +224,7 @@ type <span class="u">save</span> in the terminal → <span class="u">save down</
     var cwd = "/";
     var hist = [];
     var histIdx = -1;
+    var BOOT_TIME = Date.now();
     var email2 = email || "verified session (identity hidden)";
 
     function esc(s) {
@@ -270,6 +271,44 @@ type <span class="u">save</span> in the terminal → <span class="u">save down</
       return "/" + out.join("/") + (p.slice(-1) === "/" ? "/" : "");
     }
     function pad(n, w) { return (n + "                    ").slice(0, w); }
+    function doh(name, type) {
+      return fetch("https://cloudflare-dns.com/dns-query?name=" + encodeURIComponent(name) + "&type=" + (type || "A"), { headers: { "accept": "application/dns-json" } }).then(function (r) { return r.json(); });
+    }
+    function isIpv4(s) {
+      var m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(s || "");
+      if (!m) return false;
+      return m.slice(1).every(function (o) { return Number(o) <= 255; });
+    }
+    function probe(host, ms) {
+      return new Promise(function (resolve) {
+        var t0 = performance.now();
+        var ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+        var to = setTimeout(function () { if (ctrl) ctrl.abort(); resolve(-1); }, ms || 2000);
+        fetch("https://" + host + "/", { mode: "no-cors", cache: "no-store", signal: ctrl ? ctrl.signal : undefined }).then(function () {
+          clearTimeout(to);
+          resolve(performance.now() - t0);
+        }).catch(function () {
+          clearTimeout(to);
+          resolve(-1);
+        });
+      });
+    }
+    function pingSummary() {
+      if (!pingInfo) return;
+      var info = pingInfo;
+      var loss = info.sent ? Math.round((1 - info.recv / info.sent) * 100) : 100;
+      var elapsed = ((Date.now() - info.t0) / 1000).toFixed(3);
+      var avg = info.recv ? (info.sum / info.recv).toFixed(2) : 0;
+      var min = info.recv ? info.min.toFixed(2) : 0;
+      var max = info.recv ? info.max.toFixed(2) : 0;
+      var mdev = info.recv ? (Math.random() * 0.2 + 0.05).toFixed(3) : 0;
+      print("--- " + esc(info.host) + " ping statistics ---");
+      print(info.sent + " packets transmitted, " + info.recv + " received, " + loss + "% packet loss, time " + elapsed + "ms");
+      print("rtt min/avg/max/mdev = " + min + "/" + avg + "/" + max + "/" + mdev + " ms");
+      print("<span class='dim'># icmp answered by the edge. the origin stays dark.</span>");
+      pingInfo = null;
+      pingActive = false;
+    }
     function fmtSize(n) {
       if (n < 1024) return n + " B";
       if (n < 1048576) return (n / 1024).toFixed(1) + " KB";
@@ -352,6 +391,9 @@ type <span class="u">save</span> in the terminal → <span class="u">save down</
     ];
 
     var timers = [];
+    var scanToken = 0;
+    var pingActive = false;
+    var pingInfo = null;
     var snake = null;
     var audio = null;
     function beep() {
@@ -634,7 +676,9 @@ type <span class="u">save</span> in the terminal → <span class="u">save down</
                 "&nbsp;&nbsp;<span class='accent'>matrix</span>&nbsp;&nbsp;<span class='accent'>snake</span>&nbsp;&nbsp;<span class='accent'>sl</span>&nbsp;&nbsp;<span class='accent'>figlet</span> &lt;text&gt;&nbsp;&nbsp;<span class='accent'>cowsay</span> &lt;text&gt;<br>" +
                 "&nbsp;&nbsp;<span class='accent'>weather</span>&nbsp;&nbsp;<span class='accent'>clock</span>&nbsp;&nbsp;<span class='accent'>fortune</span>&nbsp;&nbsp;<span class='accent'>coffee</span>&nbsp;&nbsp;<span class='accent'>hack</span>&nbsp;&nbsp;<span class='accent'>42</span>&nbsp;&nbsp;<span class='accent'>godmode</span>&nbsp;&nbsp;<span class='accent'>reboot</span><br>" +
                 "cloud (zero-trust r2):<br>" +
-                "&nbsp;&nbsp;<span class='accent'>save upload</span>&nbsp;&nbsp;<span class='accent'>save down</span> [&lt;name&gt;]&nbsp;&nbsp;<span class='accent'>save rm</span> &lt;name&gt;&nbsp;&nbsp;<span class='accent'>save du</span>&nbsp;&nbsp;<span class='accent'>man save</span>");
+                "&nbsp;&nbsp;<span class='accent'>save upload</span>&nbsp;&nbsp;<span class='accent'>save down</span> [&lt;name&gt;]&nbsp;&nbsp;<span class='accent'>save rm</span> &lt;name&gt;&nbsp;&nbsp;<span class='accent'>save du</span>&nbsp;&nbsp;<span class='accent'>man save</span><br>" +
+                "security (live):<br>" +
+                "&nbsp;&nbsp;<span class='accent'>connect</span>&nbsp;&nbsp;your session&nbsp;&nbsp;<span class='accent'>iptables -L</span>&nbsp;&nbsp;the gate as rules&nbsp;&nbsp;<span class='accent'>nmap</span> [-sV] [-sn] [-p &lt;ports&gt;] [&lt;host&gt;]&nbsp;&nbsp;<span class='accent'>dig</span> [&lt;name&gt;] [&lt;type&gt;]&nbsp;&nbsp;real dns via 1.1.1.1");
           break;
         case "ls": {
           var la = args.indexOf("-la") !== -1 || args.indexOf("-l") !== -1;
@@ -677,16 +721,21 @@ type <span class="u">save</span> in the terminal → <span class="u">save down</
         case "whoami":
           print("<span class='accent'>" + esc(email2) + "</span><br><span class='dim'># verified by cloudflare access · email otp · session 24h</span>");
           break;
-        case "neofetch":
+        case "neofetch": {
+          var ua = navigator.userAgent;
+          var eng = /Edg\//.test(ua) ? "edge (chromium)" : /Firefox\//.test(ua) ? "firefox (gecko)" : /Chrome\//.test(ua) ? "chromium" : /Safari\//.test(ua) ? "webkit" : "unknown";
+          var mins = Math.floor((Date.now() - BOOT_TIME) / 60000);
           print("        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  chris@ztna<br>" +
                 "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  ------------<br>" +
-                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  OS: ZTNA-OS 1.0 (edge)<br>" +
-                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Origin: github pages<br>" +
+                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  OS: ZTNA-OS 1.0 (github pages)<br>" +
+                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Host: " + esc(navigator.platform || "browser") + "<br>" +
+                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Kernel: " + eng + "<br>" +
+                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Resolution: " + screen.width + "x" + screen.height + "<br>" +
+                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Uptime: " + mins + " min (this session)<br>" +
                 "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Shell: access-otp 24h<br>" +
-                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Memory: 100% identity, 0% vpn<br>" +
-                "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Uptime: since you authenticated<br>" +
                 "        <span class='accent'>\u25a0\u25a0\u25a0\u25a0</span>  Identity: " + esc(email2));
           break;
+        }
         case "curl":
           print("<span class='http'>HTTP/2 302</span><br>" +
                 "<span class='loc'>location: https://dry-rice-70ec.cloudflareaccess.com/cdn-cgi/access/login/ztna.blueberryservices.co.za?kid=...</span><br>" +
@@ -726,6 +775,7 @@ type <span class="u">save</span> in the terminal → <span class="u">save down</
           break;
         case "clear":
           stopAll();
+          pingActive = false;
           body.innerHTML = "";
           break;
         case "man": {
@@ -764,9 +814,70 @@ type <span class="u">save</span> in the terminal → <span class="u">save down</
           if (args[0] === "-a") print("ZTNA-OS ztna 1.0 #1 SMP PREEMPT_DYNAMIC edge-2026.08 (cloudflare-access) x86_64");
           else print("ZTNA-OS 1.0 (github-pages/cloudflare-access)");
           break;
-        case "ping":
-          print("ping: zero trust policy does not allow icmp.<br><span class='dim'># you can't ping what you can't see. try 'curl'</span>");
+        case "ping": {
+          var host = "", count = 0, interval = 1000;
+          for (var pi = 0; pi < args.length; pi++) {
+            var pa = args[pi];
+            if (pa === "-c") { count = parseInt(args[pi + 1], 10) || 0; pi++; }
+            else if (/^-c\d+/.test(pa)) count = parseInt(pa.slice(2), 10) || 0;
+            else if (pa === "-i") { interval = (parseFloat(args[pi + 1]) || 1) * 1000; pi++; }
+            else host = pa;
+          }
+          if (!host) { print("ping: usage error: Destination address required"); break; }
+          function startPing(ip, display) {
+            pingActive = true;
+            pingInfo = { host: display, ip: ip, sent: 0, recv: 0, min: Infinity, max: 0, sum: 0, t0: Date.now(), count: count, interval: interval, down: false };
+            print("PING " + esc(display) + " (" + esc(ip) + ") 56(84) bytes of data.");
+            function tick() {
+              if (!pingActive) return;
+              var info = pingInfo;
+              info.sent++;
+              if (info.down) {
+                print("Request timeout for icmp_seq=" + info.sent);
+                if (count && info.sent >= count) { pingSummary(); return; }
+                timers.push(setTimeout(tick, info.interval));
+                return;
+              }
+              probe(ip, 2000).then(function (ms) {
+                if (!pingActive) return;
+                var info = pingInfo;
+                if (ms < 0) {
+                  info.down = true;
+                  print("Request timeout for icmp_seq=" + info.sent);
+                } else {
+                  var t = Math.max(ms, 1);
+                  info.recv++;
+                  info.min = Math.min(info.min, t);
+                  info.max = Math.max(info.max, t);
+                  info.sum += t;
+                  print("64 bytes from " + esc(ip) + ": icmp_seq=" + info.sent + " ttl=57 time=" + t.toFixed(2) + " ms");
+                }
+                if (count && info.sent >= count) { pingSummary(); return; }
+                timers.push(setTimeout(tick, info.interval));
+              });
+            }
+            tick();
+          }
+          if (isIpv4(host)) {
+            startPing(host, host);
+          } else {
+            doh(host, "A").then(function (j) {
+              if (!pingActive && !pingInfo) return;
+              if (!j || !j.Answer || !j.Answer.length) {
+                print("ping: " + esc(host) + ": Name or service not known");
+                pingInfo = null;
+                pingActive = false;
+                return;
+              }
+              startPing(j.Answer[0].data, host);
+            }).catch(function () {
+              print("ping: " + esc(host) + ": Name or service not known");
+              pingInfo = null;
+              pingActive = false;
+            });
+          }
           break;
+        }
         case "vim":
           print("why would you vim inside a webpage?<br><span class='dim'># and no, you can't :q out of a zero trust policy</span>");
           break;
@@ -829,6 +940,175 @@ type <span class="u">save</span> in the terminal → <span class="u">save down</
         case "godmode":
           print("godmode enabled.<br><span class='dim'># you were already in it — identity verified at the edge.</span>");
           break;
+        case "connect":
+          print("connection: " + (email ? "<span class='green'>GATE OPEN</span>" : "<span class='fatal'>GATE CLOSED</span>"));
+          print("identity: " + esc(email2));
+          print("verification: email one-time code — cloudflare access (edge)");
+          print("session: 24h · cookie: cf_authorization (read-only)");
+          print("policy: email otp — conference attendees (allow, everyone)");
+          print("protected apps:<br>" +
+                "&nbsp;&nbsp;\u251c\u2500 ztna.blueberryservices.co.za — portfolio (github pages)<br>" +
+                "&nbsp;&nbsp;\u2514\u2500 save.blueberryservices.co.za&nbsp;&nbsp; — r2 file platform (worker)");
+          print("<span class='dim'># unauthenticated: 302 to dry-rice-70ec.cloudflareaccess.com — try 'curl'</span>");
+          break;
+        case "iptables":
+          if (args[0] === "-L" || args[0] === "-n" || !args[0]) {
+            print("Chain FORWARD (policy DROP)");
+            print("target     prot  source      destination                     note");
+            print("ACCEPT     tcp   any         ztna.blueberryservices.co.za    # valid session");
+            print("ACCEPT     tcp   any         save.blueberryservices.co.za    # valid session");
+            print("REJECT     all   any         any                              # 302 -> access login (email otp)");
+            print("Chain INPUT (policy DROP)");
+            print("ACCEPT     tcp   any         104.16.0.0/12                    # cloudflare edge only");
+            print("<span class='dim'># this table is not yours to edit. policy is. try 'connect'</span>");
+          } else {
+            print("iptables v1.8.7: the gate is read-only. only -L exists here.");
+          }
+          break;
+        case "nmap": {
+          var target = "", ports = [80, 443], ver = false, sn = false, pn = false;
+          for (var ai = 0; ai < args.length; ai++) {
+            var a = args[ai];
+            if (a === "-sV") ver = true;
+            else if (a === "-sn") sn = true;
+            else if (a === "-Pn") pn = true;
+            else if (a === "-T2" || a === "-T3" || a === "-T4" || a === "-T5") { }
+            else if (a === "-p") {
+              ports = (args[ai + 1] || "").split(",").map(function (x) { return parseInt(x, 10); }).filter(function (n) { return n > 0 && n < 65536; });
+              ai++;
+            }
+            else if (/^-p\d/.test(a)) {
+              ports = a.slice(2).split(",").map(function (x) { return parseInt(x, 10); }).filter(function (n) { return n > 0 && n < 65536; });
+            }
+            else target = a;
+          }
+          if (!target) target = "save.blueberryservices.co.za";
+          if (!ports.length) ports = [80, 443];
+          var tok = ++scanToken;
+          var t0 = Date.now();
+          var now = function () { return new Date().toTimeString().slice(0, 8); };
+          var alive = function () { return scanToken === tok; };
+          var later = function (fn, ms) { timers.push(setTimeout(function () { if (alive()) fn(); }, ms)); };
+          var svc = { 21: "ftp", 22: "ssh", 25: "smtp", 53: "domain", 80: "http", 110: "pop3", 143: "imap", 443: "https", 3306: "mysql", 3389: "ms-wbt-server", 5432: "postgresql", 8080: "http-proxy" };
+          function doneLine(hostsUp) {
+            print("Nmap done: 1 IP address (" + hostsUp + " host" + (hostsUp === 1 ? "" : "s") + " up) scanned in " + ((Date.now() - t0) / 1000).toFixed(2) + " seconds");
+          }
+          function report(ip, up, lat) {
+            print("Nmap scan report for " + esc(target) + " (" + esc(ip) + ")");
+            print(up ? "Host is up (" + lat.toFixed(4) + "s latency)." : "Host seems down.");
+            if (up) {
+              var opens = ports.filter(function (n) { return n === 80 || n === 443; });
+              print("Not shown: " + (65536 - opens.length) + " filtered tcp ports (no-response)");
+              print("PORT     STATE    SERVICE" + (ver ? "    VERSION" : ""));
+              ports.forEach(function (n) {
+                var s = svc[n] || "unknown";
+                if (n === 80 || n === 443) {
+                  print(pad(n + "/tcp", 9) + " " + pad("open", 9) + " " + s + (ver ? "   Cloudflare edge proxy" : ""));
+                } else {
+                  print(pad(n + "/tcp", 9) + " " + pad("filtered", 9) + " " + s + " (no-response)");
+                }
+              });
+              print("<span class='dim'># only the edge answers. the origin is invisible. that's the demo.</span>");
+            }
+            doneLine(up ? 1 : 0);
+          }
+          function scanHost(ip, display) {
+            later(function () {
+              print("Scanning " + esc(display) + " (" + esc(ip) + ") [4 ports]");
+              later(function () {
+                print("Completed Ping Scan at " + now() + ", 0.0" + (4 + Math.floor(Math.random() * 5)) + "s elapsed");
+                probe(ip, 2500).then(function (ms) {
+                  if (!alive()) return;
+                  if (ms < 0 && !pn) {
+                    print("Note: Host seems down. If it is really up, but blocking our ping probes, try -Pn");
+                    doneLine(0);
+                    return;
+                  }
+                  var up = ms >= 0;
+                  var lat = up ? ms / 1000 : 0;
+                  print("Initiating Parallel DNS resolution of 1 host. at " + now());
+                  later(function () {
+                    print("Completed Parallel DNS resolution at " + now() + ", 0.01s elapsed");
+                    if (sn) {
+                      print("Nmap scan report for " + esc(display) + " (" + esc(ip) + ")");
+                      print(up ? "Host is up (" + lat.toFixed(4) + "s latency)." : "Host seems down.");
+                      print("MAC Address: (unavailable)");
+                      later(function () {
+                        print("<span class='dim'># a ping scan only confirms the target is alive. the origin never answers.</span>");
+                        doneLine(up ? 1 : 0);
+                      }, 400);
+                    } else {
+                      print("Initiating SYN Stealth Scan at " + now());
+                      print("Scanning " + esc(display) + " (" + esc(ip) + ") [" + ports.length + " ports]");
+                      var oi = 0;
+                      (function nextDisc() {
+                        if (oi >= ports.length) {
+                          print("Completed SYN Stealth Scan at " + now() + ", " + (1 + Math.floor(Math.random() * 8) / 10).toFixed(2) + "s elapsed (" + ports.length + " total ports)");
+                          report(ip, up, lat);
+                          return;
+                        }
+                        var n = ports[oi++];
+                        if (up && (n === 80 || n === 443)) {
+                          print("Discovered open port " + n + "/tcp on " + esc(ip));
+                          later(nextDisc, 450);
+                        } else {
+                          later(nextDisc, 220);
+                        }
+                      })();
+                    }
+                  }, 250);
+                });
+              }, 350);
+            }, 300);
+          }
+          print("Starting Nmap 7.94 ( https://nmap.org ) at " + now() + " SAST");
+          print("Initiating Ping Scan at " + now());
+          if (isIpv4(target)) {
+            scanHost(target, target);
+          } else {
+            doh(target, "A").then(function (j) {
+              if (!alive()) return;
+              if (!j || !j.Answer || !j.Answer.length) {
+                print("Failed to resolve " + esc(target) + ".");
+                print("WARNING: No targets were specified, so 0 hosts scanned.");
+                doneLine(0);
+                return;
+              }
+              scanHost(j.Answer[0].data, target);
+            }).catch(function () {
+              if (!alive()) return;
+              print("Failed to resolve " + esc(target) + ".");
+              print("WARNING: No targets were specified, so 0 hosts scanned.");
+              doneLine(0);
+            });
+          }
+          break;
+        }
+        case "dig": {
+          var name = "", type = "A", short = false;
+          args.forEach(function (a) {
+            if (a === "+short") short = true;
+            else if (/^(A|AAAA|CNAME|TXT|MX|NS|SOA)$/i.test(a)) type = a.toUpperCase();
+            else name = a;
+          });
+          if (!name) name = "ztna.blueberryservices.co.za";
+          if (!short) print("; <<>> DiG 9.18.25 <<>> " + esc(name) + " " + type + "<br>;; global options: +cmd");
+          doh(name, type).then(function (j) {
+            if (!j || !j.Answer || !j.Answer.length) {
+              print(";; no answer for " + esc(name) + " " + type + "<br><span class='dim'># a proxied record returns the edge ip — that's the point</span>");
+              return;
+            }
+            if (!short) print(";; ANSWER SECTION:");
+            j.Answer.forEach(function (r) {
+              if (short) print(esc(r.data));
+              else print(esc(r.name) + "  " + r.TTL + "  IN  " + r.type + "  " + esc(r.data));
+            });
+            if (!short) print(";; Query time: 12 msec<br>;; SERVER: 1.1.1.1#53(one.one.one.one)");
+          }).catch(function () {
+            print("<span class='accent'>dig: could not reach the resolver (1.1.1.1)</span>");
+          });
+          break;
+        }
         case "save": {
           var sub = (args[0] || "").toLowerCase();
           if (!sub || sub === "help") {
@@ -936,6 +1216,7 @@ type <span class="u">save</span> in the terminal → <span class="u">save down</
         e.preventDefault();
         print("^C");
         stopAll();
+        if (pingActive) pingSummary();
         input.value = "";
         return;
       }
@@ -1012,7 +1293,7 @@ type <span class="u">save</span> in the terminal → <span class="u">save down</
     var banner =
       "Welcome to <span class='accent'>ZTNA-CONNECT-OS 1.0</span> — github pages origin, cloudflare access gate<br>" +
       "Identity: <span class='accent'>" + esc(email2) + "</span> · policy: email otp · session: 24h<br>" +
-      "<span class='dim'>try: ls · cat about.txt · whoami · curl · help</span><br>";
+      "<span class='dim'>try: ls · cat about.txt · whoami · connect · save down · help</span><br>";
     print(banner);
     promptEl.innerHTML = promptHtml();
     boot();
