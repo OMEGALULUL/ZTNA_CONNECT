@@ -1,10 +1,12 @@
 # ZTNA Connect
 
-A GitHub Pages portfolio published behind **Cloudflare Zero Trust Access** — built as a live demo for BG ITversity Connect.
+A GitHub Pages portfolio published behind **Cloudflare Zero Trust Access** — built as a live demo for BG ITversity Connect. It ships with a second zero-trust app: **save://**, a file platform on Cloudflare R2 that you can drive from inside the terminal.
 
-Anyone who visits the site must first prove their identity (email + one-time code) before the page is ever served. This is **clientless Zero Trust Network Access (ZTNA)** in action: identity-based access control enforced at the edge, with no VPN and no client software.
+Anyone who visits must first prove their identity (email + one-time code) before the page — or any file operation — is ever served. This is **clientless Zero Trust Network Access (ZTNA)** in action: identity-based access control enforced at the edge, with no VPN and no client software.
 
-**Live demo URL:** `https://ztna.blueberryservices.co.za`
+**Live demo URLs:**
+- `https://ztna.blueberryservices.co.za` — the terminal portfolio
+- `https://save.blueberryservices.co.za` — the R2 file platform (upload UI)
 
 ---
 
@@ -33,27 +35,64 @@ Attendee browser
 
 The portfolio itself is a plain static site on GitHub Pages. Cloudflare fronts it with a proxied DNS record, and Cloudflare Access sits in front of the hostname as the security gate. The origin is never exposed — visitors interact only with Cloudflare.
 
+### save:// — the file platform
+
+```
+save.blueberryservices.co.za
+      │
+      ▼
+┌────────────────────────────────────────────────┐
+│              Cloudflare Edge (proxy)           │
+│                                                │
+│   ┌────────────────────────────────────────┐   │
+│   │      Cloudflare Access (ZTNA gate)     │   │
+│   │   same policy: Email OTP → allow       │   │
+│   └────────────────────────────────────────┘   │
+│                     │                          │
+└─────────────────────┼──────────────────────────┘
+                      ▼
+             Worker "save-drive"
+        ┌───────────────┼───────────────┐
+        ▼               ▼               ▼
+   upload site     REST API        R2 bucket
+   (drag & drop)   /api/files     save-blueberry
+```
+
+One Worker serves the whole platform: the drag-and-drop upload page, a small REST API, and access to the R2 bucket. The same Worker is also mounted at `ztna.blueberryservices.co.za/api/*`, so the LUNIX terminal talks to it same-origin — one identity session drives both apps.
+
+Terminal integration:
+
+```bash
+save              # menu
+save upload       # opens the save:// drop site
+save down         # lists the bucket in the terminal
+save down file.txt# downloads a file
+save rm file.txt  # deletes a file
+man save          # manual page
+```
+
 ---
 
 ## How it works (layer by layer)
 
 | Layer | Component | Role |
 |---|---|---|
-| 1. DNS | `CNAME ztna → omegalulul.github.io` (proxied, orange cloud) | Routes traffic through Cloudflare; origin IP stays hidden |
+| 1. DNS | `CNAME ztna → omegalulul.github.io`, `CNAME save → blueberryservices.co.za` (both proxied) | Routes traffic through Cloudflare; origin IP stays hidden |
 | 2. TLS | Cloudflare Universal SSL | HTTPS for `*.blueberryservices.co.za` at the edge |
-| 3. Gate | Cloudflare Access app (self-hosted) | Enforces policy on every request before it reaches the origin |
+| 3. Gate | Cloudflare Access apps (self-hosted) | Enforce policy on every request, for both hostnames, before anything reaches an origin |
 | 4. Policy | `Email OTP — Conference Attendees` (decision: allow, include: everyone) | Anyone with a valid email can authenticate with a one-time code; session lasts 24h |
-| 5. Origin | GitHub Pages (`ZTNA_CONNECT` repo) | Serves the static portfolio (index.html) |
+| 5. Origin (ztna) | GitHub Pages (`ZTNA_CONNECT` repo) | Serves the static portfolio (index.html) |
+| 6. Origin (save) | Worker `save-drive` + R2 bucket `save-blueberry` | Upload UI + REST API + object storage; the terminal talks to the same Worker via `ztna.../api/*` |
 
 ### Request flow
 
-1. Visitor requests `ztna.blueberryservices.co.za`.
+1. Visitor requests `ztna.blueberryservices.co.za` (or `save.blueberryservices.co.za`).
 2. Cloudflare Access checks for a valid session cookie (`CF_Authorization`).
 3. No session → `302` redirect to the Access login (`*.cloudflareaccess.com`).
 4. User enters email → receives one-time code → Access validates it.
-5. Session issued → request forwarded to GitHub Pages origin → portfolio loads.
+5. Session issued → request forwarded to the origin (GitHub Pages or the save Worker) → page/file operation proceeds.
 
-Unauthenticated requests never reach GitHub — they're stopped at the Cloudflare edge. You can verify this yourself:
+Unauthenticated requests never reach any origin — they're stopped at the Cloudflare edge. You can verify this yourself:
 
 ```bash
 curl -I https://ztna.blueberryservices.co.za
@@ -99,11 +138,12 @@ curl -I https://ztna.blueberryservices.co.za
 ## Setup summary (how this was built)
 
 1. **GitHub:** created `ZTNA_CONNECT` repo, pushed `index.html`, enabled Pages, set custom domain `ztna.blueberryservices.co.za` (Enforce HTTPS left off — Cloudflare handles TLS).
-2. **Cloudflare DNS:** added proxied `CNAME ztna → omegalulul.github.io`.
-3. **Cloudflare Access:** created self-hosted app for `ztna.blueberryservices.co.za`, session 24h.
-4. **Policy:** `Email OTP — Conference Attendees` → decision *allow*, include *everyone*.
+2. **Cloudflare DNS:** added proxied `CNAME ztna → omegalulul.github.io` and `CNAME save → blueberryservices.co.za`.
+3. **Cloudflare Access:** created self-hosted apps for `ztna.blueberryservices.co.za` and `save.blueberryservices.co.za`, both 24h sessions.
+4. **Policy:** `Email OTP — Conference Attendees` → decision *allow*, include *everyone* (one policy per app).
+5. **R2 + Worker:** created bucket `save-blueberry`; deployed Worker `save-drive` (upload UI, REST API, R2 binding) and mounted it on `save.blueberryservices.co.za/*` and `ztna.blueberryservices.co.za/api/*`.
 
-> Note: pages created via API — no cloudflared, no tunnels, pure edge ZTNA.
+> Note: everything created via API — no cloudflared, no tunnels, pure edge ZTNA. Requests are gated by Access at the edge before the Worker is ever invoked.
 
 ---
 
@@ -112,5 +152,6 @@ curl -I https://ztna.blueberryservices.co.za
 - Always demo in **incognito** (or a fresh browser) — otherwise Cloudflare silently reuses your own session and skips the login.
 - Show the Access dashboard: **Access → Apps → ZTNA Connect Portfolio → Policies** to display the rule live.
 - Show **Access audit logs** after an attendee logs in — real evidence of identity-based access.
+- The save demo packs well: `save down` lists the bucket in the terminal, `save upload` opens the drop site, then upload a file on the projector and watch it appear in `save down`.
 - If the OTP email lands in spam, that's a talking point: email delivery is the only dependency of this auth model.
-- Trivia for the audience: this page itself explains the demo in its "Demo Project" section.
+- Trivia for the audience: this page itself explains the demo in its "how it works" section below the terminal.

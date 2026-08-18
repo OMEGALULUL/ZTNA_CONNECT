@@ -133,7 +133,7 @@
 
   <div class="explain">
     <div class="comment"># why this page is locked</div>
-    <p>ZTNA in one sentence: the network doesn't trust you — you prove yourself on every request, and the origin never sees anyone who hasn't. This page is a demo of that, enforced by Cloudflare Access at the edge.</p>
+    <p>ZTNA in one sentence: the network doesn't trust you — you prove yourself on every request, and the origin never sees anyone who hasn't. This page and its file platform (save://, an R2 bucket) are both gated by Cloudflare Access at the edge.</p>
     <div class="log"><span class="u">$</span> curl -I https://ztna.blueberryservices.co.za
 <span class="http">HTTP/2 302</span>
 <span class="loc">location: https://dry-rice-70ec.cloudflareaccess.com/cdn-cgi/access/login/...</span>
@@ -141,11 +141,14 @@
 <span class="dim"># unauthenticated requests die here, at the edge</span>
 
 <span class="accent">how it works:</span>
-1. dns: ztna → github pages, proxied through cloudflare
+1. dns: ztna + save → proxied through cloudflare (github pages / r2 worker)
 2. gate: cloudflare access checks every request for a session
 3. no session → 302 to the login, email + one-time code
-4. verified → github pages origin serves this file
-5. no vpn, no client, no exposed origin — identity is the key</div>
+4. verified → github pages serves this page; the worker touches r2
+5. no vpn, no client, no exposed origin — identity is the key
+
+<span class="accent">try it:</span>
+type <span class="u">save</span> in the terminal → <span class="u">save down</span> lists the bucket, <span class="u">save upload</span> opens the drop site</div>
   </div>
 
   <footer>
