@@ -213,7 +213,7 @@
       "passwd": "who lives here",
       "version": "kernel version"
     };
-    var CMDS = ["help", "ls", "cd", "cat", "pwd", "whoami", "neofetch", "curl", "ssh", "open", "echo", "date", "history", "clear", "sudo", "tree", "exit", "man", "apt", "uname", "ping", "vim", "nano", "top", "df", "matrix", "snake", "figlet", "cowsay", "weather", "clock", "fortune", "coffee", "sl", "hack", "42", "godmode", "rm", "checksec", "reboot"];
+    var CMDS = ["help", "ls", "cd", "cat", "pwd", "whoami", "neofetch", "curl", "ssh", "open", "echo", "date", "history", "clear", "sudo", "tree", "exit", "man", "apt", "uname", "ping", "vim", "nano", "top", "df", "matrix", "snake", "figlet", "cowsay", "weather", "clock", "fortune", "coffee", "sl", "hack", "42", "godmode", "rm", "checksec", "save", "reboot"];
 
     var body = document.getElementById("vt-body");
     var input = document.getElementById("vt-input");
@@ -267,6 +267,12 @@
       return "/" + out.join("/") + (p.slice(-1) === "/" ? "/" : "");
     }
     function pad(n, w) { return (n + "                    ").slice(0, w); }
+    function fmtSize(n) {
+      if (n < 1024) return n + " B";
+      if (n < 1048576) return (n / 1024).toFixed(1) + " KB";
+      if (n < 1073741824) return (n / 1048576).toFixed(1) + " MB";
+      return (n / 1073741824).toFixed(2) + " GB";
+    }
     function listHtml(dir) {
       var out = [];
       DIRS[dir].forEach(function (n) {
@@ -623,7 +629,9 @@
                 "&nbsp;&nbsp;<span class='accent'>sudo</span>&nbsp;&nbsp;<span class='accent'>apt</span>&nbsp;&nbsp;<span class='accent'>vim</span>&nbsp;&nbsp;<span class='accent'>top</span>&nbsp;&nbsp;<span class='accent'>tree</span>&nbsp;&nbsp;<span class='accent'>exit</span><br>" +
                 "games &amp; fun:<br>" +
                 "&nbsp;&nbsp;<span class='accent'>matrix</span>&nbsp;&nbsp;<span class='accent'>snake</span>&nbsp;&nbsp;<span class='accent'>sl</span>&nbsp;&nbsp;<span class='accent'>figlet</span> &lt;text&gt;&nbsp;&nbsp;<span class='accent'>cowsay</span> &lt;text&gt;<br>" +
-                "&nbsp;&nbsp;<span class='accent'>weather</span>&nbsp;&nbsp;<span class='accent'>clock</span>&nbsp;&nbsp;<span class='accent'>fortune</span>&nbsp;&nbsp;<span class='accent'>coffee</span>&nbsp;&nbsp;<span class='accent'>hack</span>&nbsp;&nbsp;<span class='accent'>42</span>&nbsp;&nbsp;<span class='accent'>godmode</span>&nbsp;&nbsp;<span class='accent'>reboot</span>");
+                "&nbsp;&nbsp;<span class='accent'>weather</span>&nbsp;&nbsp;<span class='accent'>clock</span>&nbsp;&nbsp;<span class='accent'>fortune</span>&nbsp;&nbsp;<span class='accent'>coffee</span>&nbsp;&nbsp;<span class='accent'>hack</span>&nbsp;&nbsp;<span class='accent'>42</span>&nbsp;&nbsp;<span class='accent'>godmode</span>&nbsp;&nbsp;<span class='accent'>reboot</span><br>" +
+                "cloud (zero-trust r2):<br>" +
+                "&nbsp;&nbsp;<span class='accent'>save upload</span>&nbsp;&nbsp;<span class='accent'>save down</span> [&lt;name&gt;]&nbsp;&nbsp;<span class='accent'>save rm</span> &lt;name&gt;&nbsp;&nbsp;<span class='accent'>save du</span>&nbsp;&nbsp;<span class='accent'>man save</span>");
           break;
         case "ls": {
           var la = args.indexOf("-la") !== -1 || args.indexOf("-l") !== -1;
@@ -686,9 +694,9 @@
           print("<span class='accent'>identity verified</span> — cloudflare access · email otp · session 24h<br><span class='dim'># no keys, no passwords, just a one-time code and a session</span>");
           break;
         case "open": {
-          var map = { knockout: "https://github.com/Blueberry-Technologies/Knockout-Pub---Grill", skybre: "https://skybre.co.za", capiofin: "https://github.com/OMEGALULUL", homebrew: "https://github.com/OMEGALULUL", ztna: "https://ztna.blueberryservices.co.za" };
+          var map = { knockout: "https://github.com/Blueberry-Technologies/Knockout-Pub---Grill", skybre: "https://skybre.co.za", capiofin: "https://github.com/OMEGALULUL", homebrew: "https://github.com/OMEGALULUL", ztna: "https://ztna.blueberryservices.co.za", save: "https://save.blueberryservices.co.za" };
           var k = (args[0] || "").toLowerCase();
-          if (!map[k]) { print("open: unknown project — try: knockout, skybre, capiofin, homebrew, ztna"); break; }
+          if (!map[k]) { print("open: unknown project — try: knockout, skybre, capiofin, homebrew, ztna, save"); break; }
           window.open(map[k], "_blank");
           print("opening " + esc(k) + " in a new tab…");
           break;
@@ -717,9 +725,35 @@
           stopAll();
           body.innerHTML = "";
           break;
-        case "man":
+        case "man": {
+          var t = (args[0] || "").toLowerCase();
+          if (t === "save") {
+            print("<span class='dim'>SAVE(1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Zero Trust File Platform&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SAVE(1)</span><br><br>" +
+                  "<span class='accent'>NAME</span><br>" +
+                  "&nbsp;&nbsp;save - upload, list and download files on a cloudflare r2 bucket, gated by cloudflare access<br><br>" +
+                  "<span class='accent'>SYNOPSIS</span><br>" +
+                  "&nbsp;&nbsp;save upload<br>" +
+                  "&nbsp;&nbsp;save down<br>" +
+                  "&nbsp;&nbsp;save down &lt;file&gt;<br>" +
+                  "&nbsp;&nbsp;save rm &lt;file&gt;<br>" +
+                  "&nbsp;&nbsp;save du<br><br>" +
+                  "<span class='accent'>DESCRIPTION</span><br>" +
+                  "&nbsp;&nbsp;save upload&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;opens the save:// web ui, where you drop files into the bucket<br>" +
+                  "&nbsp;&nbsp;save down&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lists every file currently stored in the bucket<br>" +
+                  "&nbsp;&nbsp;save down &lt;file&gt;&nbsp;&nbsp;downloads &lt;file&gt; to your machine<br>" +
+                  "&nbsp;&nbsp;save rm &lt;file&gt;&nbsp;&nbsp;&nbsp;removes &lt;file&gt; from the bucket<br>" +
+                  "&nbsp;&nbsp;save du&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reports total bytes stored<br><br>" +
+                  "<span class='accent'>SECURITY</span><br>" +
+                  "&nbsp;&nbsp;the edge verifies your identity (email otp, 24h session) before any request<br>" +
+                  "&nbsp;&nbsp;reaches r2. no vpn, no credentials on the client, no public bucket.<br><br>" +
+                  "<span class='accent'>SEE ALSO</span><br>" +
+                  "&nbsp;&nbsp;help(1), open(1), ztna(1)<br><br>" +
+                  "<span class='dim'>BlueBerryServices&nbsp;&nbsp;2026-08-19&nbsp;&nbsp;SAVE(1)</span>");
+            break;
+          }
           print("<span class='dim'>No manual entry for '" + esc(args[0] || "") + "'<br># this is a fake terminal, type help</span>");
           break;
+        }
         case "apt":
           print("Reading package lists... Done<br><span class='accent'>E: Unable to locate package root</span><br><span class='dim'># zero trust means nobody gets root</span>");
           break;
@@ -792,6 +826,71 @@
         case "godmode":
           print("godmode enabled.<br><span class='dim'># you were already in it — identity verified at the edge.</span>");
           break;
+        case "save": {
+          var sub = (args[0] || "").toLowerCase();
+          if (!sub || sub === "help") {
+            print("save: zero-trust file platform — r2 bucket, gated at the edge by cloudflare access<br>" +
+                  "&nbsp;&nbsp;<span class='accent'>save upload</span>&nbsp;&nbsp;&nbsp;open save://blueberryservices and drop files in<br>" +
+                  "&nbsp;&nbsp;<span class='accent'>save down</span>&nbsp;&nbsp;&nbsp;list what's in the bucket<br>" +
+                  "&nbsp;&nbsp;<span class='accent'>save down</span> &lt;name&gt;&nbsp;&nbsp;download a file<br>" +
+                  "&nbsp;&nbsp;<span class='accent'>save rm</span> &lt;name&gt;&nbsp;&nbsp;delete a file<br>" +
+                  "&nbsp;&nbsp;<span class='accent'>save du</span>&nbsp;&nbsp;&nbsp;show total bytes stored<br>" +
+                  "&nbsp;&nbsp;<span class='accent'>man save</span>&nbsp;&nbsp;full manual<br>" +
+                  "&nbsp;&nbsp;<span class='dim'># identity is verified at the edge before any request touches r2</span>");
+            break;
+          }
+          if (sub === "upload" || sub === "open") {
+            window.open("https://save.blueberryservices.co.za/", "_blank");
+            print("opening save://blueberryservices — drop files to upload…");
+            break;
+          }
+          if (sub === "down") {
+            if (!args[1]) {
+              print("<span class='dim'>fetching save://blueberryservices…</span>");
+              fetch("/api/files").then(function (r) { return r.json(); }).then(function (j) {
+                if (!j.files) { print("<span class='accent'>save: session expired — reload the page to re-authenticate</span>"); return; }
+                if (!j.files.length) { print("<span class='dim'>save: bucket is empty. use 'save upload'</span>"); return; }
+                var total = 0;
+                j.files.forEach(function (f) {
+                  total += f.size;
+                  print(pad(esc(f.name), 44) + pad(fmtSize(f.size), 12) + "<span class='dim'>" + new Date(f.uploaded).toLocaleString() + "</span>");
+                });
+                print("<span class='dim'>" + j.files.length + " file(s), " + fmtSize(total) + " — 'save down &lt;name&gt;' to grab one</span>");
+              }).catch(function () {
+                print("<span class='accent'>save: could not reach the api</span>");
+              });
+              break;
+            }
+            var a = document.createElement("a");
+            a.href = "/api/files/" + encodeURIComponent(args[1]);
+            a.download = args[1];
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            print("downloading " + esc(args[1]) + "…");
+            break;
+          }
+          if (sub === "rm") {
+            if (!args[1]) { print("save rm: missing file name — try <span class='accent'>save rm old.txt</span>"); break; }
+            fetch("/api/files/" + encodeURIComponent(args[1]), { method: "DELETE" }).then(function (r) {
+              if (r.ok) print("removed " + esc(args[1]));
+              else print("<span class='fatal'>save: could not remove " + esc(args[1]) + " — not found?</span>");
+            });
+            break;
+          }
+          if (sub === "du") {
+            fetch("/api/files").then(function (r) { return r.json(); }).then(function (j) {
+              var t = 0;
+              (j.files || []).forEach(function (f) { t += f.size; });
+              print("save du: " + fmtSize(t) + " in " + (j.files || []).length + " file(s)");
+            }).catch(function () {
+              print("<span class='accent'>save: could not reach the api</span>");
+            });
+            break;
+          }
+          print("save: unknown option — try <span class='accent'>save help</span> or <span class='accent'>man save</span>");
+          break;
+        }
         case "reboot":
           stopAll();
           body.innerHTML = "";
