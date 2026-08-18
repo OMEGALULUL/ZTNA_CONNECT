@@ -858,26 +858,28 @@ type <span class="u">save</span> in the terminal → <span class="u">save down</
                   total += f.size;
                   print(pad(esc(f.name), 44) + pad(fmtSize(f.size), 12) + "<span class='dim'>" + new Date(f.uploaded).toLocaleString() + "</span>");
                 });
-                print("<span class='dim'>" + j.files.length + " file(s), " + fmtSize(total) + " — 'save down &lt;name&gt;' to grab one</span>");
+                print("<span class='dim'>" + j.files.length + " file(s), " + fmtSize(total) + " — 'save down &lt;name&gt;' to grab one (spaces ok)</span>");
               }).catch(function () {
                 print("<span class='accent'>save: could not reach the api</span>");
               });
               break;
             }
+            var fname = args.slice(1).join(" ");
             var a = document.createElement("a");
-            a.href = "/api/files/" + encodeURIComponent(args[1]);
-            a.download = args[1];
+            a.href = "/api/files/" + encodeURIComponent(fname);
+            a.download = fname;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            print("downloading " + esc(args[1]) + "…");
+            print("downloading " + esc(fname) + "…");
             break;
           }
           if (sub === "rm") {
             if (!args[1]) { print("save rm: missing file name — try <span class='accent'>save rm old.txt</span>"); break; }
-            fetch("/api/files/" + encodeURIComponent(args[1]), { method: "DELETE" }).then(function (r) {
-              if (r.ok) print("removed " + esc(args[1]));
-              else print("<span class='fatal'>save: could not remove " + esc(args[1]) + " — not found?</span>");
+            var fname = args.slice(1).join(" ");
+            fetch("/api/files/" + encodeURIComponent(fname), { method: "DELETE" }).then(function (r) {
+              if (r.ok) print("removed " + esc(fname));
+              else print("<span class='fatal'>save: could not remove " + esc(fname) + " — not found?</span>");
             });
             break;
           }
