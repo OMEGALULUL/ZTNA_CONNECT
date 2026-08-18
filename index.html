@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christopher Leon Visser — Portfolio</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --card: #111728;
+    --accent: #f6821f;
+    --accent2: #ffb36b;
+    --text: #e8ecf5;
+    --muted: #8b93a8;
+    --border: #1e2740;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+  header {
+    padding: 90px 0 60px;
+    background: radial-gradient(ellipse at top, rgba(246,130,31,.15), transparent 60%);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(246,130,31,.12);
+    border: 1px solid rgba(246,130,31,.4);
+    color: var(--accent2);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 22px;
+  }
+  h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; }
+  h1 span { color: var(--accent); }
+  .tagline { color: var(--muted); font-size: 1.15rem; margin-top: 14px; }
+  .cta { margin-top: 30px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block;
+    padding: 12px 26px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary { background: var(--accent); color: #1a1206; box-shadow: 0 4px 20px rgba(246,130,31,.35); }
+  .btn-ghost { border: 1px solid var(--border); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent2); }
+  section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+  h2 { font-size: 1.6rem; margin-bottom: 26px; }
+  h2 small { display: block; color: var(--muted); font-size: .85rem; font-weight: 400; margin-top: 4px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-3px); }
+  .card h3 { font-size: 1.05rem; margin-bottom: 8px; }
+  .card h3 a { color: var(--accent2); text-decoration: none; }
+  .card p { color: var(--muted); font-size: .92rem; }
+  .tags { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag {
+    font-size: .75rem;
+    color: var(--accent2);
+    border: 1px solid rgba(246,130,31,.35);
+    background: rgba(246,130,31,.08);
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .ztna-note {
+    background: linear-gradient(135deg, rgba(246,130,31,.1), rgba(246,130,31,.04));
+    border: 1px dashed rgba(246,130,31,.45);
+    border-radius: 14px;
+    padding: 22px;
+    font-size: .95rem;
+  }
+  .ztna-note strong { color: var(--accent2); }
+  .ztna-note code { background: rgba(255,255,255,.07); padding: 2px 8px; border-radius: 6px; font-size: .85em; }
+  footer {
+    padding: 34px 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: .85rem;
+  }
+  footer .shield { color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="badge">Zero Trust Demo · BG ITversity Connect</div>
+    <h1>Hi, I'm <span>Christopher Leon Visser</span></h1>
+    <p class="tagline">Aspiring IT professional &amp; web developer building secure, real-world solutions.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/OMEGALULUL" target="_blank">My GitHub</a>
+      <a class="btn btn-ghost" href="mailto:chris@blueberryservices.co.za">Get in touch</a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="container">
+    <h2>What I Do <small>Projects &amp; focus areas</small></h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Web Development</h3>
+        <p>Responsive sites and apps with modern HTML, CSS and JavaScript — from landing pages to full prototypes.</p>
+        <div class="tags"><span class="tag">HTML/CSS</span><span class="tag">JavaScript</span><span class="tag">Responsive</span></div>
+      </div>
+      <div class="card">
+        <h3>Network &amp; Security</h3>
+        <p>Hands-on work with Cloudflare (DNS, Workers, Zero Trust Access), network fundamentals and secure hosting setups.</p>
+        <div class="tags"><span class="tag">Cloudflare</span><span class="tag">Zero Trust</span><span class="tag">DNS</span></div>
+      </div>
+      <div class="card">
+        <h3>IT Support</h3>
+        <p>End-user support, hardware troubleshooting and systems administration for small businesses.</p>
+        <div class="tags"><span class="tag">Windows</span><span class="tag">Networking</span><span class="tag">Troubleshooting</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Demo Project <small>This very page</small></h2>
+    <div class="ztna-note">
+      <p><strong>You're looking at a Zero Trust Network Access demo.</strong></p>
+      <p>This site is hosted on GitHub Pages and published behind a Cloudflare Access policy. Nobody gets here without first proving their identity — you entered your email and received a one-time code. That's clientless ZTNA: identity-based access control enforced at the edge, no VPN, no client software.</p>
+      <p style="margin-top:10px;">Policy: <code>Email OTP</code> · Session: <code>24h</code> · Enforced by: <code>Cloudflare Access</code></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p><span class="shield">&#128737;</span> This page is protected by Cloudflare Zero Trust Access</p>
+    <p style="margin-top:6px;">Built for BG ITversity Connect</p>
+  </div>
+</footer>
+
+</body>
+</html>
